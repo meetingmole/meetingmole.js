@@ -1,7 +1,6 @@
-﻿body {
+﻿/*
+This file is for the dev/test environment only it is not included in the final product.
+*/
+body {
     font-family: 'Segoe UI', sans-serif;
-}
-
-span {
-    font-style: italic;
 }

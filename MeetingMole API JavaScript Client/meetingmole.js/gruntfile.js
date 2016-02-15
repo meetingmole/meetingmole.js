@@ -1,10 +1,7 @@
 ﻿/// <binding AfterBuild='cssmin:all, uglify:all, copypackage' ProjectOpened='bower:install' />
-/*
-This file in the main entry point for defining grunt tasks and using grunt plugins.
-Click here to learn more. http://go.microsoft.com/fwlink/?LinkID=513275&clcid=0x409
-*/
 module.exports = function (grunt) {
 	grunt.initConfig({
+		pkg: grunt.file.readJSON('package.json'),
 		bower: {
 			install: {
 				options: {
@@ -63,7 +60,11 @@ module.exports = function (grunt) {
 		uglify: {
 			options: {
 				sourceMap: true,
-				mangle: true
+				mangle: true,
+				banner: '/*\n * MeetingMole API JavaScript Client v<%= pkg.version %>\n'
+					+ " * Copyright 2015-2016 MeetingMole GmbH. All Rights Reserved.\n"
+					+ " * More info, documentation and source: https://github.com/meetingmole/meetingmole.js\n"
+					+ "*/"
 			},
 			all: {
 				files: [{

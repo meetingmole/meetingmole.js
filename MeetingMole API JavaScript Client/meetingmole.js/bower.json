@@ -1,8 +1,8 @@
 {
 	"name": "meetingmole.js",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"homepage": "https://github.com/meetingmole/meetingmole.js",
-	"description": "MeetingMole API Javascript Client",
+	"description": "MeetingMole API JavaScript Client",
 	"main":"package/min/meetingmole.js",
 	"authors": [
 		"MeetingMole GmbH"
@@ -17,7 +17,8 @@
 		"jquery": ">=2.1.0"
 	},
 	"devDependencies": {
-		"bootstrap": ">=3.3.0"
+		"bootstrap": "3.3.6",
+		"jquery": ">=2.2.0"
 	},
 	"exportsOverride": {
 		"bootstrap": {
