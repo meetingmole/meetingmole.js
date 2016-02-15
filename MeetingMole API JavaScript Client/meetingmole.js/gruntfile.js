@@ -39,6 +39,23 @@ module.exports = function (grunt) {
 				}]
 			}
 		},
+		copy: {
+			'package': {
+				files: [
+				{
+					cwd: "js",
+					src: "**/*",
+					expand: true,
+					dest: "../../package/"
+				},
+					{
+						cwd: "",
+						src: "bower.json",
+						dest: "../../bower.json"
+					}
+				]
+			}
+		},
 		uglify: {
 			options: {
 				sourceMap: true,
@@ -64,4 +81,5 @@ module.exports = function (grunt) {
 
 	// Register alias tasks
 	grunt.registerTask("all", ["bower:install", "cssmin:all", "uglify:all"]);
+	grunt.registerTask("createpackage", ["all", "copy:package"]);
 };
