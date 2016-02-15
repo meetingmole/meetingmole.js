@@ -8,15 +8,15 @@
 	],
 	"license": "MIT",
 	"ignore": [
-		"**/.*",
+		"MeetingMole API JavaScript Client",
 		"node_modules",
-		"bower_components",
-		"test",
-		"tests"
+		"bower_components"
 	],
 	"dependencies": {
-		"bootstrap": "3.3.6",
 		"jquery": "2.1.4"
+	},
+	"devDependencies": {
+		"bootstrap": "3.3.6"
 	},
 	"exportsOverride": {
 		"bootstrap": {
