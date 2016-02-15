@@ -1,4 +1,4 @@
-﻿/// <binding AfterBuild='cssmin:all, uglify:all, copy:package' ProjectOpened='bower:install' />
+﻿/// <binding AfterBuild='cssmin:all, uglify:all, copypackage' ProjectOpened='bower:install' />
 /*
 This file in the main entry point for defining grunt tasks and using grunt plugins.
 Click here to learn more. http://go.microsoft.com/fwlink/?LinkID=513275&clcid=0x409
@@ -44,7 +44,7 @@ module.exports = function (grunt) {
 				files: [
 				{
 					cwd: "js",
-					src: "**/*",
+					src: "**/meetingmole.js",
 					expand: true,
 					dest: "../../package/"
 				},
@@ -55,6 +55,10 @@ module.exports = function (grunt) {
 					}
 				]
 			}
+		},
+		clean: {
+			options: { force: true },
+			'package': "../../package"
 		},
 		uglify: {
 			options: {
@@ -82,4 +86,5 @@ module.exports = function (grunt) {
 	// Register alias tasks
 	grunt.registerTask("all", ["bower:install", "cssmin:all", "uglify:all"]);
 	grunt.registerTask("createpackage", ["all", "copy:package"]);
+	grunt.registerTask("copypackage", ["clean:package", "copy:package"]);
 };

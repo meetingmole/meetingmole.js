@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"homepage": "https://github.com/meetingmole/meetingmole.js",
 	"description": "MeetingMole API Javascript Client",
-	"main":"js/min/meetingmole.js",
+	"main":"package/min/meetingmole.js",
 	"authors": [
 		"MeetingMole GmbH"
 	],

@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"homepage": "https://github.com/meetingmole/meetingmole.js",
 	"description": "MeetingMole API Javascript Client",
-	"main":"js/min/meetingmole.js",
+	"main":"package/min/meetingmole.js",
 	"authors": [
 		"MeetingMole GmbH"
 	],
@@ -14,10 +14,10 @@
 		"bower_components"
 	],
 	"dependencies": {
-		"jquery": "2.1.4"
+		"jquery": ">=2.1.0"
 	},
 	"devDependencies": {
-		"bootstrap": "3.3.6"
+		"bootstrap": ">=3.3.0"
 	},
 	"exportsOverride": {
 		"bootstrap": {
