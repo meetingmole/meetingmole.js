@@ -24,10 +24,10 @@
   <ItemGroup>
     <Content Include="css\app.css" />
     <Content Include="css\min\app.css" />
-    <Content Include="css\min\min\app.css" />
     <Content Include="gruntfile.js" />
     <Content Include="index.html" />
     <Content Include="js\compiled\app.js" />
+    <Content Include="js\compiled\meetingmole.js" />
     <Content Include="js\min\app.js" />
     <Content Include="js\min\meetingmole.js" />
     <Content Include="vendor\bootstrap\css\bootstrap-theme.css" />
@@ -56,6 +56,7 @@
     <Content Include="vendor\bootstrap\fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="vendor\jquery\jquery.min.map" />
     <Content Include="js\min\meetingmole.js.map" />
+    <Content Include="js\compiled\meetingmole.js.map" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
