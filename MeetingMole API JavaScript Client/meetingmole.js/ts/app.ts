@@ -8,6 +8,9 @@ module MeetingMole.JSClientTest {
 	var jqServerURL: JQuery = null;
 	var oClient: JSClient = null;
 
+	/**
+	 * Inits the test app
+	 */
 	export function Init(): void {
 		jqPingButton = $("#btnPing");
 		jqResultsDisplay= $("#divResponseDisplay");
@@ -35,14 +38,51 @@ module MeetingMole.JSClientTest {
 			log("Pinging "+oClient.ServerURL()+"...");
 			oClient.Ping((oResult) => {
 				log("Ping success!", LogTypes.Success);
-				log(JSON.stringify(oResult), LogTypes.Indent);
+				log("Response:" + syntaxHighlight(oResult), LogTypes.Indent);
 			}, (oError) => {
 				log("Ping failed.");
-				log("Error: " + JSON.stringify(oError),LogTypes.Error);
+				log("Error: " + syntaxHighlight(oError),LogTypes.Error);
 			});
 		});
 	}
 
+	/**
+	 * From:  http://stackoverflow.com/questions/4810841/how-can-i-pretty-print-json-using-javascript
+	 * @param oJSON - JSON to hilite. If not a string, will be converted to JSON string first.
+	 */
+	function syntaxHighlight(oJSON:any):string
+	{
+		if(typeof oJSON !== "string")
+		{
+			oJSON = JSON.stringify(oJSON, undefined, 2);
+		}
+		oJSON = oJSON.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		return "<pre>" + oJSON.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match: any)=>
+		{
+			var cls = "number";
+			if(/^"/.test(match))
+			{
+				if(/:$/.test(match))
+				{
+					cls = "key";
+				} else
+				{
+					cls = "string";
+				}
+			} else if(/true|false/.test(match))
+			{
+				cls = "boolean";
+			} else if(/null/.test(match))
+			{
+				cls = "null";
+			}
+			return "<span class=\"" + cls + '">' + match + "</span>";
+		}) + "</pre>";
+	}
+
+	/**
+	 * Log message types
+	 */
 	enum LogTypes
 	{
 		Normal,

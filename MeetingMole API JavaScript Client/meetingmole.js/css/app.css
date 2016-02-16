@@ -1,37 +1,77 @@
 ﻿/*
 This file is for the dev/test environment only. It is not included in the final product.
 */
-body {
-    font-family: 'Segoe UI', sans-serif;
+body
+{
+	font-family: 'Segoe UI', sans-serif;
 	color: black;
 }
 
-.log-normal {
+.log-normal
+{
 	font-size: 9pt;
 	font-family: monospace;
 	margin-bottom: 2px;
 }
 
-.log-indent {
+.log-indent
+{
 	font-size: 9pt;
 	font-family: monospace;
 	margin-bottom: 2px;
 	padding-left: 20px;
 }
 
-.log-error {
+.log-error
+{
 	color: red;
 	font-size: 10pt;
 	font-family: monospace;
 	margin-bottom: 4px;
 }
-.log-success{
+
+.log-success
+{
 	color: green;
 	font-size: 10pt;
 	font-family: monospace;
 	margin-bottom: 4px;
 }
 
-#divResponseDisplay {
+#divResponseDisplay
+{
 	background: #eee;
+	padding: 3px;
+}
+
+pre
+{
+	padding: 5px;
+	margin: 5px;
+	font-size: 9pt;
+}
+
+.string
+{
+	color: green;
+}
+
+.number
+{
+	color: darkorange;
+}
+
+.boolean
+{
+	color: blue;
+}
+
+.null
+{
+	color: magenta;
+}
+
+.key
+{
+	color: red;
 }

@@ -10,6 +10,9 @@ var MeetingMole;
         var jqPingButton = null;
         var jqServerURL = null;
         var oClient = null;
+        /**
+         * Inits the test app
+         */
         function Init() {
             jqPingButton = $("#btnPing");
             jqResultsDisplay = $("#divResponseDisplay");
@@ -36,14 +39,45 @@ var MeetingMole;
                 log("Pinging " + oClient.ServerURL() + "...");
                 oClient.Ping(function (oResult) {
                     log("Ping success!", LogTypes.Success);
-                    log(JSON.stringify(oResult), LogTypes.Indent);
+                    log("Response:" + syntaxHighlight(oResult), LogTypes.Indent);
                 }, function (oError) {
                     log("Ping failed.");
-                    log("Error: " + JSON.stringify(oError), LogTypes.Error);
+                    log("Error: " + syntaxHighlight(oError), LogTypes.Error);
                 });
             });
         }
         JSClientTest.Init = Init;
+        /**
+         * From:  http://stackoverflow.com/questions/4810841/how-can-i-pretty-print-json-using-javascript
+         * @param oJSON - JSON to hilite. If not a string, will be converted to JSON string first.
+         */
+        function syntaxHighlight(oJSON) {
+            if (typeof oJSON !== "string") {
+                oJSON = JSON.stringify(oJSON, undefined, 2);
+            }
+            oJSON = oJSON.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return "<pre>" + oJSON.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = "number";
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = "key";
+                    }
+                    else {
+                        cls = "string";
+                    }
+                }
+                else if (/true|false/.test(match)) {
+                    cls = "boolean";
+                }
+                else if (/null/.test(match)) {
+                    cls = "null";
+                }
+                return "<span class=\"" + cls + '">' + match + "</span>";
+            }) + "</pre>";
+        }
+        /**
+         * Log message types
+         */
         var LogTypes;
         (function (LogTypes) {
             LogTypes[LogTypes["Normal"] = 0] = "Normal";
