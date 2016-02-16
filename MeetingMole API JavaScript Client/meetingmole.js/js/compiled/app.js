@@ -9,6 +9,7 @@ var MeetingMole;
         var jqResultsDisplay = null;
         var jqPingButton = null;
         var jqServerURL = null;
+        var jqClearLogButton = null;
         var oClient = null;
         /**
          * Inits the test app
@@ -17,6 +18,7 @@ var MeetingMole;
             jqPingButton = $("#btnPing");
             jqResultsDisplay = $("#divResponseDisplay");
             jqServerURL = $("#txServerURL");
+            jqClearLogButton = $("#btnClearLog");
             jqServerURL.off("change").on("change", function () {
                 if (oClient) {
                     oClient.Dispose();
@@ -31,6 +33,9 @@ var MeetingMole;
                 }
             });
             jqServerURL.val("http://localhost:56936").trigger("change");
+            jqClearLogButton.off("click").on("click", function () {
+                clearLog();
+            });
             jqPingButton.off("click").on("click", function () {
                 if (!oClient) {
                     log("Not connected to server. Please define server URL to connect to.", LogTypes.Error);
@@ -85,6 +90,9 @@ var MeetingMole;
             LogTypes[LogTypes["Success"] = 2] = "Success";
             LogTypes[LogTypes["Indent"] = 3] = "Indent";
         })(LogTypes || (LogTypes = {}));
+        function clearLog() {
+            jqResultsDisplay.empty();
+        }
         function log(sText, eType) {
             if (eType === void 0) { eType = LogTypes.Normal; }
             if (!sText) {

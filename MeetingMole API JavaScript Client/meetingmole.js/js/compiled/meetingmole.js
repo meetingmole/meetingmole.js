@@ -12,7 +12,7 @@ var MeetingMole;
     var JSClient = (function () {
         /**
          * Constructs a new JS Client
-         * @param {string} sServerURL - The URL of the server to connect to.
+         * @param {string} sServerURL - The URL of the server to connect to. Must start with http:// or https://.
          */
         function JSClient(sServerURL) {
             this.sServerURL = null;
@@ -180,7 +180,7 @@ var MeetingMole;
         JSClient.prototype.handleProtocolError = function (response) {
             if (!response) {
                 return {
-                    HttpErrorCode: 400,
+                    HttpErrorCode: -1,
                     Error: "Unknown error",
                     ErrorDetails: ""
                 };
@@ -198,6 +198,7 @@ var MeetingMole;
             return {
                 HttpErrorCode: iErrorCode,
                 Error: sError,
+                // TODO:
                 ErrorDetails: "TODO:"
             };
         };

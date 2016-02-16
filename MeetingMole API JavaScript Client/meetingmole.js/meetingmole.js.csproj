@@ -43,10 +43,6 @@
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="js\compiled\app.d.ts" />
-    <None Include="js\compiled\constants.d.ts" />
-    <None Include="js\compiled\meetingmole.d.ts" />
-    <None Include="js\compiled\models.d.ts" />
     <TypeScriptCompile Include="ts\app.ts" />
     <TypeScriptCompile Include="ts\models.ts" />
     <TypeScriptCompile Include="ts\constants.ts" />

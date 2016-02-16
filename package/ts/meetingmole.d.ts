@@ -47,7 +47,7 @@ declare module MeetingMole {
         private bIsConnected;
         /**
          * Constructs a new JS Client
-         * @param {string} sServerURL - The URL of the server to connect to.
+         * @param {string} sServerURL - The URL of the server to connect to. Must start with http:// or https://.
          */
         constructor(sServerURL: string);
         /**

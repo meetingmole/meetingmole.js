@@ -6,6 +6,7 @@ module MeetingMole.JSClientTest {
 	var jqResultsDisplay: JQuery = null;
 	var jqPingButton: JQuery = null;
 	var jqServerURL: JQuery = null;
+	var jqClearLogButton: JQuery = null;
 	var oClient: JSClient = null;
 
 	/**
@@ -15,6 +16,7 @@ module MeetingMole.JSClientTest {
 		jqPingButton = $("#btnPing");
 		jqResultsDisplay= $("#divResponseDisplay");
 		jqServerURL = $("#txServerURL");
+		jqClearLogButton = $("#btnClearLog");
 
 		jqServerURL.off("change").on("change", () => {
 			if (oClient) {
@@ -29,6 +31,12 @@ module MeetingMole.JSClientTest {
 			}
 		});
 		jqServerURL.val("http://localhost:56936").trigger("change");
+
+		jqClearLogButton.off("click").on("click", () =>
+		{
+			clearLog();
+		});
+
 		jqPingButton.off("click").on("click", () =>
 		{
 			if(!oClient) {
@@ -89,6 +97,10 @@ module MeetingMole.JSClientTest {
 		Error,
 		Success,
 		Indent
+	}
+
+	function clearLog() {
+		jqResultsDisplay.empty();
 	}
 
 	function log(sText: string, eType:LogTypes=LogTypes.Normal)

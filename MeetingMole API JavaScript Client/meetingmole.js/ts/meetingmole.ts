@@ -49,7 +49,7 @@ module MeetingMole
 
 		/**
 		 * Constructs a new JS Client
-		 * @param {string} sServerURL - The URL of the server to connect to.
+		 * @param {string} sServerURL - The URL of the server to connect to. Must start with http:// or https://.
 		 */
 		public constructor(sServerURL: string)
 		{
@@ -205,7 +205,7 @@ module MeetingMole
 			if(!response)
 			{
 				return {
-					HttpErrorCode: 400,
+					HttpErrorCode: -1,
 					Error: "Unknown error",
 					ErrorDetails: ""
 				}
@@ -224,6 +224,7 @@ module MeetingMole
 			return {
 				HttpErrorCode: iErrorCode,
 				Error: sError,
+				// TODO:
 				ErrorDetails: "TODO:"
 		};
 		}
