@@ -49,6 +49,11 @@ module.exports = function (grunt) {
 						cwd: "",
 						src: "bower.json",
 						dest: "../../bower.json"
+					},
+					{
+						cwd: "",
+						src: "typings.json",
+						dest: "../../typings.json"
 					}
 				]
 			}
@@ -56,6 +61,16 @@ module.exports = function (grunt) {
 		clean: {
 			options: { force: true },
 			'package': "../../package"
+		},
+		concat: {
+			options: {
+				separator: '\n'
+			},
+			definitions: {
+				files: {
+					"../../package/ts/meetingmole.d.ts": ["js/compiled/*.d.ts"]
+				}
+			}
 		},
 		uglify: {
 			options: {
@@ -68,7 +83,7 @@ module.exports = function (grunt) {
 			},
 			all: {
 				files: {
-					"js/min/meetingmole.js": ["js/compiled/**/*.js", "!app.js"],
+					"js/min/meetingmole.js": ["js/compiled/**/*.js", "!app.js"]
 				}
 			}
 		}
@@ -78,11 +93,12 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-contrib-clean");
 	grunt.loadNpmTasks("grunt-contrib-copy");
 	grunt.loadNpmTasks("grunt-contrib-uglify");
-	grunt.loadNpmTasks("grunt-contrib-compress");
+	//grunt.loadNpmTasks("grunt-contrib-compress");
 	grunt.loadNpmTasks("grunt-contrib-cssmin");
+	grunt.loadNpmTasks("grunt-contrib-concat");
 
 	// Register alias tasks
 	grunt.registerTask("all", ["bower:install", "cssmin:all", "uglify:all"]);
 	grunt.registerTask("createpackage", ["all", "copy:package"]);
-	grunt.registerTask("copypackage", ["clean:package", "copy:package"]);
+	grunt.registerTask("copypackage", ["clean:package", "copy:package", "concat:definitions"]);
 };
