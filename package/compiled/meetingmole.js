@@ -12,6 +12,7 @@ var MeetingMole;
     var JSClient = (function () {
         /**
          * Constructs a new JS Client
+         * @constructor
          * @param {string} sServerURL - The URL of the server to connect to. Must start with http:// or https://.
          */
         function JSClient(sServerURL) {

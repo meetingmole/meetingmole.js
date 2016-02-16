@@ -10,6 +10,8 @@
 		"grunt-contrib-compress": "0.14.0",
 		"grunt-contrib-cssmin": "0.14.0",
 		"grunt-contrib-concat": "0.5.1",
-		"typings": "0.6.7"
+		"typings": "0.6.7",
+		"typedoc": "0.3.12",
+		"grunt-typedoc": "0.2.3"
 	}
 }

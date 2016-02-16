@@ -1,7 +1,7 @@
-﻿/// <binding AfterBuild='cssmin:all, uglify:all, copypackage' ProjectOpened='bower:install' />
+﻿/// <binding AfterBuild='cssmin:all, uglify:all, typedoc:all, copypackage' ProjectOpened='bower:install' />
 module.exports = function (grunt) {
 	grunt.initConfig({
-		pkg: grunt.file.readJSON('package.json'),
+		pkg: grunt.file.readJSON("package.json"),
 		bower: {
 			install: {
 				options: {
@@ -58,17 +58,28 @@ module.exports = function (grunt) {
 				]
 			}
 		},
+		typedoc: {
+			all: {
+				options: {
+					module: "commonjs",
+					target: "es5",
+					out: "doc/",
+					name: "meetingmole.js"
+				},
+				src: ["ts/**/*.ts", "typings/browser.d.ts", "!ts/app.ts"]
+			}
+		},
 		clean: {
 			options: { force: true },
 			'package': "../../package"
 		},
 		concat: {
 			options: {
-				separator: '\n'
+				separator: "\n"
 			},
 			definitions: {
 				files: {
-					"../../package/ts/meetingmole.d.ts": ["js/compiled/*.d.ts"]
+					"../../package/ts/meetingmole.d.ts": ["js/compiled/*.d.ts", "!js/compiled/app.d.ts"]
 				}
 			}
 		},
@@ -76,7 +87,7 @@ module.exports = function (grunt) {
 			options: {
 				sourceMap: true,
 				mangle: true,
-				banner: '/*\n * MeetingMole API JavaScript Client v<%= pkg.version %>\n'
+				banner: "/*\n * MeetingMole API JavaScript Client v<%= pkg.version %>\n"
 					+ " * Copyright 2015-2016 MeetingMole GmbH. All Rights Reserved.\n"
 					+ " * More info, documentation and source: https://github.com/meetingmole/meetingmole.js\n"
 					+ "*/"
@@ -96,9 +107,10 @@ module.exports = function (grunt) {
 	//grunt.loadNpmTasks("grunt-contrib-compress");
 	grunt.loadNpmTasks("grunt-contrib-cssmin");
 	grunt.loadNpmTasks("grunt-contrib-concat");
+	grunt.loadNpmTasks("grunt-typedoc");
 
 	// Register alias tasks
-	grunt.registerTask("all", ["bower:install", "cssmin:all", "uglify:all"]);
+	grunt.registerTask("all", ["bower:install", "cssmin:all", "uglify:all", "typedoc:all"]);
 	grunt.registerTask("createpackage", ["all", "copy:package"]);
 	grunt.registerTask("copypackage", ["clean:package", "copy:package", "concat:definitions"]);
 };

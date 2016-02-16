@@ -1,10 +1,3 @@
-declare module MeetingMole.JSClientTest {
-    /**
-     * Inits the test app
-     */
-    function Init(): void;
-}
-
 declare module MeetingMole.Constants {
     /**
      * API Base URL
@@ -47,6 +40,7 @@ declare module MeetingMole {
         private bIsConnected;
         /**
          * Constructs a new JS Client
+         * @constructor
          * @param {string} sServerURL - The URL of the server to connect to. Must start with http:// or https://.
          */
         constructor(sServerURL: string);

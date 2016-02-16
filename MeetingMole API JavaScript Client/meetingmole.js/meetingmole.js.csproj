@@ -64,6 +64,7 @@
     <Content Include="typings.json" />
     <Content Include="js\compiled\constants.js.map" />
     <Content Include="js\compiled\models.js.map" />
+    <None Include="jsdoc.conf.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
