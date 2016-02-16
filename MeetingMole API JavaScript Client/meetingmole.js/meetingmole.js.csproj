@@ -27,8 +27,9 @@
     <Content Include="gruntfile.js" />
     <Content Include="index.html" />
     <Content Include="js\compiled\app.js" />
+    <Content Include="js\compiled\constants.js" />
     <Content Include="js\compiled\meetingmole.js" />
-    <Content Include="js\min\app.js" />
+    <Content Include="js\compiled\models.js" />
     <Content Include="js\min\meetingmole.js" />
     <Content Include="vendor\bootstrap\css\bootstrap-theme.css" />
     <Content Include="vendor\bootstrap\css\bootstrap-theme.min.css" />
@@ -43,6 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="ts\app.ts" />
+    <TypeScriptCompile Include="ts\models.ts" />
+    <TypeScriptCompile Include="ts\constants.ts" />
     <TypeScriptCompile Include="ts\meetingmole.ts" />
     <TypeScriptCompile Include="typings\browser.d.ts" />
     <TypeScriptCompile Include="typings\browser\ambient\jquery\jquery.d.ts" />
@@ -51,7 +54,6 @@
     <Content Include="bower.json" />
     <Content Include="js\compiled\app.js.map" />
     <Content Include="package.json" />
-    <Content Include="js\min\app.js.map" />
     <Content Include="vendor\bootstrap\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="vendor\bootstrap\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="vendor\bootstrap\fonts\glyphicons-halflings-regular.woff" />
@@ -60,6 +62,8 @@
     <Content Include="js\min\meetingmole.js.map" />
     <Content Include="js\compiled\meetingmole.js.map" />
     <Content Include="typings.json" />
+    <Content Include="js\compiled\constants.js.map" />
+    <Content Include="js\compiled\models.js.map" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

@@ -67,12 +67,9 @@ module.exports = function (grunt) {
 					+ "*/"
 			},
 			all: {
-				files: [{
-					expand: true,
-					cwd: "js/compiled",
-					src: "**/*.js",
-					dest: "js/min"
-				}]
+				files: {
+					"js/min/meetingmole.js": ["js/compiled/**/*.js", "!app.js"],
+				}
 			}
 		}
 	});
