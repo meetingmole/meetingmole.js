@@ -4,12 +4,18 @@ declare module MeetingMole.Constants {
      */
     var BaseURL: string;
     /**
-     * API action URLs
+     * Access API action URLs
      */
-    var APIURLs: {
+    var AccessAPIURLs: {
         SimpleLogin: string;
         About: string;
         CheckToken: string;
         Logout: string;
+    };
+    /**
+     * Team API action URLs
+     */
+    var TeamAPIURLs: {
+        GetAll: string;
     };
 }

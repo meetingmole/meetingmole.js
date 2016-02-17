@@ -4,20 +4,61 @@
  * Copyright 2015-2016 MeetingMole GmbH. All Rights Reserved.
  * More info, documentation and source: https://github.com/meetingmole/meetingmole.js 
 */
-module MeetingMole
+module MeetingMole.SDK
 {
 	/**
 	 * MeetingMole API JavaScript Client
 	 */
 	export class JSClient
 	{
+		/**
+		 * Constructs a new JS Client
+		 * @constructor 
+		 * @param {string} sServerURL - The URL of the server to connect to. Must start with http:// or https://.
+		 */
+		public constructor(sServerURL: string)
+		{
+			if(!sServerURL)
+			{
+				throw "Parameter sServerURL must be defined.";
+			}
+			sServerURL = sServerURL.trim();
+			if(sServerURL.indexOf("http://") !== 0
+				&& sServerURL.indexOf("https://") !== 0
+			)
+			{
+				throw "Parameter sServerURL must start with authority (http:// or https://).";
+			}
+			if(sServerURL[sServerURL.length - 1] === "/")
+			{
+				sServerURL = sServerURL.substring(0, sServerURL.length - 1);
+			}
+			this.sServerURL = sServerURL + Constants.BaseURL;
+			this.Items = new ItemService(this);
+			this.Teams = new TeamService(this);
+		}
+		/**
+		 * Current Authentication parameters.
+		 */
+		public Authentication(): Models.IAuthenticationModel 
+		{
+			return this.oAuthentication;
+		}
 		private oAuthentication: Models.IAuthenticationModel = null;
 		private dtTokenExpires: Date = null;
+		/**
+		 * Items API
+		 */
+		public Items: ItemService = null;
+		/**
+		 * Teams API
+		 */
+		public Teams: TeamService = null;
 
 		/**
 		 * API Client version
 		 */
-		public Version(): string
+		public ClientVersion(): string
 		{
 			return "1.0.2";
 		}
@@ -53,38 +94,17 @@ module MeetingMole
 		private bIsConnected: boolean = false;
 
 		/**
-		 * Constructs a new JS Client
-		 * @constructor 
-		 * @param {string} sServerURL - The URL of the server to connect to. Must start with http:// or https://.
-		 */
-		public constructor(sServerURL: string)
-		{
-			if(!sServerURL)
-			{
-				throw "Parameter sServerURL must be defined.";
-			}
-			sServerURL = sServerURL.trim();
-			if(sServerURL.indexOf("http://") !== 0
-				&& sServerURL.indexOf("https://") !== 0
-			)
-			{
-				throw "Parameter sServerURL must start with authority (http:// or https://).";
-			}
-			if(sServerURL[sServerURL.length - 1] === "/")
-			{
-				sServerURL = sServerURL.substring(0, sServerURL.length - 1);
-			}
-			this.sServerURL = sServerURL + Constants.BaseURL;
-		}
-
-		/**
 		 * Disposes the client and releases all resources. Logs out if connected.
 		 */
 		public Dispose(): void
 		{
 			if(this.IsConnected())
 			{
-				this.Logout(() => { }, () => { });
+				this.Logout(() => { }, () =>
+				{
+					// Ignore failed logout
+					this.resetAuthentication();
+				});
 			}
 			this.sServerURL = null;
 		}
@@ -94,27 +114,49 @@ module MeetingMole
 		 * @param onSuccess - Triggered on success.
 		 * @param onFailure - Triggered on failure.
 		 */
-		public Ping(onSuccess: (oResult: Models.IAboutModel) => void, onFailure: (oError: Models.IErrorModel) => void): void
+		public Ping(onSuccess: (fTimeTaken_ms: number) => void, onFailure: (oError: Models.IErrorModel) => void): void
+		{
+			var dtStarted = new Date();
+			this.GetVersionInfo(() =>
+			{
+				var dtNow = new Date();
+				var fTimeTaken_ms = dtNow.valueOf() - dtStarted.valueOf();
+				onSuccess(fTimeTaken_ms);
+			}, onFailure);
+		}
+
+		/**
+		 * Gets server version info.
+		 * @param onSuccess
+		 * @param onFailure
+		 */
+		public GetVersionInfo(onSuccess: (oResult: Models.IVersionInfo) => void, onFailure: (oError: Models.IErrorModel) => void): void
 		{
 			$.ajax({
-				url: this.sServerURL + Constants.APIURLs.About,
+				url: this.sServerURL + Constants.AccessAPIURLs.About,
 				method: "get",
 				timeout: 30000,
 				cache: false,
 				success: (response, sStatusText, jqXHR) =>
 				{
-					var oError = this.handleError(response);
+					var oError = this.HandleError(response, sStatusText, jqXHR);
 					if(oError)
 					{
 						onFailure(oError);
 						return;
 					}
-					onSuccess(response);
+					var oVersionInfo: Models.IVersionInfo =
+						{
+							ClientVersion: this.ClientVersion(),
+							APIVersion: response.Version,
+							WebAppVersion: response.WebAppVersion,
+							CoreVersion: response.CoreVersion
+						};
+					onSuccess(oVersionInfo);
 				},
-				error: (response, sStatusText, error) =>
+				error: (jqXHR:JQueryXHR, sStatusText:string, sResponse:string ) =>
 				{
-					var oError = this.handleProtocolError(response);
-					onFailure(oError);
+					this.HandleProtocolError(sResponse, sStatusText, jqXHR, onFailure);
 				}
 			});
 		}
@@ -131,16 +173,16 @@ module MeetingMole
 				return;
 			}
 			$.ajax({
-				url: this.sServerURL + Constants.APIURLs.CheckToken,
+				url: this.sServerURL + Constants.AccessAPIURLs.CheckToken,
 				data: {
 					Authentication: this.oAuthentication
 				},
 				method: "post",
 				timeout: 30000,
 				cache: false,
-				success: (response) =>
+				success: (response: any, sStatusText: string, jqXHR: JQueryXHR) =>
 				{
-					var oError = this.handleError(response);
+					var oError = this.HandleError(response, sStatusText, jqXHR);
 					if(oError)
 					{
 						onFailure(oError);
@@ -150,10 +192,9 @@ module MeetingMole
 					this.dtTokenExpires = response.TokenExpires;
 					onSuccess();
 				},
-				error: (response) =>
+				error: (jqXHR: JQueryXHR, sStatusText: string, sResponse: string) =>
 				{
-					var oError = this.handleProtocolError(response);
-					onFailure(oError);
+					this.HandleProtocolError(sResponse, sStatusText, jqXHR, onFailure);
 				}
 			});
 		}
@@ -170,17 +211,17 @@ module MeetingMole
 				return;
 			}
 			$.ajax({
-				url: this.sServerURL + Constants.APIURLs.Logout,
+				url: this.sServerURL + Constants.AccessAPIURLs.Logout,
 				data: {
 					Authentication: this.oAuthentication,
-					InvalidateAllTokens:false
+					InvalidateAllTokens: false
 				},
 				method: "post",
 				timeout: 30000,
 				cache: false,
-				success: (response) =>
+				success: (response: any, sStatusText: string, jqXHR: JQueryXHR) =>
 				{
-					var oError = this.handleError(response);
+					var oError = this.HandleError(response, sStatusText, jqXHR);
 					if(oError)
 					{
 						onFailure(oError);
@@ -189,10 +230,9 @@ module MeetingMole
 					this.resetAuthentication();
 					onSuccess(response);
 				},
-				error: (response) =>
+				error: (jqXHR: JQueryXHR, sStatusText: string, sResponse: string) =>
 				{
-					var oError = this.handleProtocolError(response);
-					onFailure(oError);
+					this.HandleProtocolError(sResponse, sStatusText, jqXHR, onFailure);
 				}
 			});
 		}
@@ -218,7 +258,7 @@ module MeetingMole
 				AccessToken: null
 			}
 			$.ajax({
-				url: this.sServerURL + Constants.APIURLs.SimpleLogin,
+				url: this.sServerURL + Constants.AccessAPIURLs.SimpleLogin,
 				data: {
 					Username: this.oAuthentication.Username,
 					Password: sPassword,
@@ -227,11 +267,9 @@ module MeetingMole
 				method: "post",
 				timeout: 60000,
 				cache: false,
-				success: (response, sStatusText, b) =>
-				{
-					//console.log(sStatusText);
-					console.log(b);
-					var oError = this.handleError(response);
+					success: (response: any, sStatusText: string, jqXHR: JQueryXHR) =>
+					{
+						var oError = this.HandleError(response, sStatusText, jqXHR);
 					if(oError)
 					{
 						this.resetAuthentication();
@@ -243,13 +281,10 @@ module MeetingMole
 					this.dtTokenExpires = response.TokenExpires;
 					onSuccess();
 				},
-				error: (response, a, b) =>
+				error: (jqXHR: JQueryXHR, sStatusText: string, sResponse: string) =>
 				{
 					this.resetAuthentication();
-					console.log(a);
-					console.log(b);
-					var oError = this.handleProtocolError(response);
-					onFailure(oError);
+					this.HandleProtocolError(sResponse, sStatusText, jqXHR, onFailure);
 				}
 			});
 		}
@@ -276,16 +311,14 @@ module MeetingMole
 				AccessToken: sAccessToken
 			}
 			$.ajax({
-				url: this.sServerURL + Constants.APIURLs.CheckToken,
+				url: this.sServerURL + Constants.AccessAPIURLs.CheckToken,
 				data: this.oAuthentication,
 				method: "post",
 				timeout: 60000,
 				cache: false,
-				success: (response, sStatusText, b) =>
+				success: (response: any, sStatusText: string, jqXHR: JQueryXHR) =>
 				{
-					//console.log(sStatusText);
-					console.log(b);
-					var oError = this.handleError(response);
+					var oError = this.HandleError(response, sStatusText, jqXHR);
 					if(oError)
 					{
 						this.resetAuthentication();
@@ -296,13 +329,10 @@ module MeetingMole
 					this.dtTokenExpires = response.TokenExpires;
 					onSuccess();
 				},
-				error: (response, a, b) =>
+				error: (jqXHR: JQueryXHR, sStatusText: string, sResponse: string) =>
 				{
 					this.resetAuthentication();
-					console.log(a);
-					console.log(b);
-					var oError = this.handleProtocolError(response);
-					onFailure(oError);
+					this.HandleProtocolError(sResponse, sStatusText, jqXHR, onFailure);
 				}
 			});
 		}
@@ -310,18 +340,25 @@ module MeetingMole
 		private resetAuthentication(): void
 		{
 			this.bIsConnected = false;
-			this.oAuthentication= null;
+			this.oAuthentication = null;
 			this.dtTokenExpires = null;
 		}
 
-		private handleError(response: any): Models.IErrorModel
+		/**
+		 * Checks if the server returned a managed error and handles it if so.
+		 * @param response - response received from the server.
+		 * @param sStatusText - status text.
+		 * @param jqXHR - associated jquery xhr handler.
+		 * @returns - null if no error, otherwise an error object.
+		 */
+		public HandleError(response: any, sStatusText:string,jqXHR:JQueryXHR): Models.IErrorModel
 		{
 			if(!response)
 			{
 				// No response from server
 				return {
 					HttpErrorCode: 400,
-					Error: "No response received from server",
+					Error: "No response received from server.",
 					ErrorDetails: ""
 				}
 			}
@@ -334,34 +371,58 @@ module MeetingMole
 			return null;
 		}
 
-		private handleProtocolError(response: JQueryXHR): Models.IErrorModel
+		/**
+		 * Handles an ajax request protocol error.
+		 * @param response
+		 * @param sStatusText
+		 * @param jqXHR
+		 * @param callBack
+		 */
+		public HandleProtocolError(response: any, sStatusText: string, jqXHR: JQueryXHR, callBack: (oError: Models.IErrorModel)=>void): void
 		{
-			if(!response)
-			{
-				return {
+			//console.log(response);
+			//console.log(sStatusText);
+			//console.log(jqXHR);
+			if(!jqXHR) {
+				callBack({
 					HttpErrorCode: -1,
 					Error: "Unknown error",
 					ErrorDetails: ""
-				}
+				});
 			}
-			// TODO:
-			console.log(response);
 			var iErrorCode = -1;
 			var sError = "Unknown error";
-			if(response.status > 0)
+			if(jqXHR.status > 0)
 			{
-				iErrorCode = response.status;
+				iErrorCode = jqXHR.status;
 			}
-			if(response.statusText)
+			if(jqXHR.statusText)
 			{
-				sError = response.statusText;
+				sError = jqXHR.statusText;
 			}
-			return {
+			var sErrorDetails = "";
+			if(jqXHR.responseJSON)
+			{
+				if(jqXHR.responseJSON.Message)
+				{
+					sErrorDetails = jqXHR.responseJSON.Message;
+				}
+				if(jqXHR.responseJSON.ModelState)
+				{
+					for(var oIndexer in jqXHR.responseJSON.ModelState) {
+						if (!jqXHR.responseJSON.ModelState.hasOwnProperty(oIndexer)) {
+							continue;
+						}
+						var aErrors: string[] = jqXHR.responseJSON.ModelState[oIndexer];
+						sErrorDetails += " " + aErrors.join(" ");
+					}
+				}
+			}
+			callBack( {
 				HttpErrorCode: iErrorCode,
 				Error: sError,
-				// TODO:
-				ErrorDetails: ""
-			};
+				ErrorDetails: sErrorDetails
+			});
 		}
 
 		private generateClientSecret(): string

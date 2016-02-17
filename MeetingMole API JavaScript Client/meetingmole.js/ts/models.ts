@@ -43,6 +43,29 @@ module MeetingMole.Models
 	}
 
 	/**
+	 * Version info
+	 */
+	export interface IVersionInfo
+	{
+		/**
+		 * Version of the client SDK
+		 */
+		ClientVersion: string;
+		/**
+		 * Version of the server API
+		 */
+		APIVersion: string;
+		/**
+		 * Version of the server web app
+		 */
+		WebAppVersion: string;
+		/**
+		 * Version of the server core
+		 */
+		CoreVersion: string;
+	}
+
+	/**
 	 * Authentication (verification) package
 	 */
 	export interface IAuthenticationModel
@@ -50,5 +73,13 @@ module MeetingMole.Models
 		Username: string;
 		AccessToken: string;
 		ClientSecret: string;
+	}
+
+	/**
+	 * MeetingMole Team
+	 */
+	export interface ITeam
+	{
+
 	}
 }

@@ -2,13 +2,15 @@
 /*
 This file is for the dev/test environment only. It is not included in the final product.
 */
-module MeetingMole.JSClientTest {
+module MeetingMole.SDK.JSClientTest {
 	var jqResultsDisplay: JQuery = null;
 	var jqPingButton: JQuery = null;
 	var jqLoginButton: JQuery = null;
 	var jqLogoutButton: JQuery = null;
 	var jqServerURL: JQuery = null;
 	var jqClearLogButton: JQuery = null;
+	var jqGetVersionInfoButton: JQuery = null;
+	var jqTeamsButton: JQuery = null;
 	var oClient: JSClient = null;
 
 	/**
@@ -21,6 +23,8 @@ module MeetingMole.JSClientTest {
 		jqResultsDisplay= $("#divResponseDisplay");
 		jqServerURL = $("#txServerURL");
 		jqClearLogButton = $("#btnClearLog");
+		jqGetVersionInfoButton = $("#btnGetVersionInfo");
+		jqTeamsButton = $("#btnGetTeams");
 
 		jqServerURL.off("change").on("change", () => {
 			if (oClient) {
@@ -29,7 +33,7 @@ module MeetingMole.JSClientTest {
 			}
 			var sServerURL = jqServerURL.val().trim();
 			if (sServerURL) {
-				oClient = new MeetingMole.JSClient(sServerURL);
+				oClient = new JSClient(sServerURL);
 			} else {
 				oClient = null;
 			}
@@ -48,12 +52,29 @@ module MeetingMole.JSClientTest {
 				return;
 			}
 			log("Pinging "+oClient.ServerURL()+"...");
-			oClient.Ping((oResult) => {
-				log("Ping success!", LogTypes.Success);
-				log("Response:" + syntaxHighlight(oResult), LogTypes.Indent);
+			oClient.Ping((fTimeTaken_ms) => {
+				log("Ping success! Took " + fTimeTaken_ms + " ms.", LogTypes.Success);
 			}, (oError) => {
-				log("Ping failed.");
-				log("Error: " + syntaxHighlight(oError),LogTypes.Error);
+				log("Ping failed.", LogTypes.Error);
+				log("Error: " + syntaxHighlight(oError));
+			});
+		});
+
+		jqGetVersionInfoButton.off("click").on("click", () =>
+		{
+			if(!oClient)
+			{
+				log("Not connected to server. Please define server URL to connect to.", LogTypes.Error);
+				return;
+			}
+			log("Version info for " + oClient.ServerURL() + ":");
+			oClient.GetVersionInfo((oResult) =>
+			{
+				log(syntaxHighlight(oResult));
+			}, (oError) =>
+			{
+				log("Could not get version info.");
+				log("Error: " + syntaxHighlight(oError), LogTypes.Error);
 			});
 		});
 		jqLoginButton.off("click").on("click", () =>
@@ -78,6 +99,7 @@ module MeetingMole.JSClientTest {
 				log("Error: " + syntaxHighlight(oError), LogTypes.Error);
 			});
 		});
+
 		jqLogoutButton.off("click").on("click", () =>
 		{
 			if(!oClient)
@@ -97,6 +119,29 @@ module MeetingMole.JSClientTest {
 			}, (oError) =>
 				{
 					log("Logout failed.");
+					log("Error: " + syntaxHighlight(oError), LogTypes.Error);
+				});
+		});
+
+		jqTeamsButton.off("click").on("click", () =>
+		{
+			if(!oClient)
+			{
+				log("Not connected to server. Please define server URL to connect to.", LogTypes.Error);
+				return;
+			}
+			if(!oClient.IsConnected())
+			{
+				log("Not logged in. Please log in first.", LogTypes.Error);
+				return;
+			}
+			log("Getting teams for "+ oClient.Username() +" from " + oClient.ServerURL() + "...");
+			oClient.Teams.GetAll((aTeams) =>
+			{
+				log("Teams got.");
+				log(syntaxHighlight(aTeams));
+			}, (oError) =>
+				{
 					log("Error: " + syntaxHighlight(oError), LogTypes.Error);
 				});
 		});

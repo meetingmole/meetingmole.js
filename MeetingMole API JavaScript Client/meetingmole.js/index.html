@@ -5,42 +5,35 @@ This file is for the dev/test environment only it is not included in the final p
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>MeetingMole API JavaScript Client SDK</title>
+	<title>MeetingMole API JavaScript Client Test Bed</title>
 	<link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css" type="text/css" />
-	<link rel="stylesheet" href="/css/app.css" type="text/css" />
+	<link rel="stylesheet" href="/css/min/app.css" type="text/css" />
 	<script src="/vendor/jquery/jquery.min.js"></script>
 	<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
-	<!-- Using unminified resources here - in the final implementation it is enough to just reference the meetingmole.js file -->
-	<script src="/js/compiled/constants.js"></script>
-	<script src="/js/compiled/models.js"></script>
-	<script src="/js/compiled/meetingmole.js"></script>
-	<script src="/js/compiled/app.js"></script>
+	<script src="/js/min/meetingmole.js"></script>
 </head>
 <body>
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-12">
 				<h1>
-					MeetingMole API JavaScript Client SDK
+					MeetingMole API JavaScript Client Test Bed
 				</h1>
-				<h2>
-					Test Bed
-				</h2>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-sm-4">
 				Server URL:
 				<input id="txServerURL" type="text" class="form-control"/>
-				<h3>
-					Test actions
-				</h3>
 				<a id="btnPing" class="btn btn-primary">Ping</a>
+				<a id="btnGetVersionInfo" class="btn btn-primary">Version Info</a>
 				<hr/>
 				<input type="text" placeholder="email" id="txLogin" class="form-control"/>
-				<input type="password" placeholder="password" id="txPassword"class="form-control"/>
+				<input type="password" placeholder="password" id="txPassword" class="form-control"/>
 				<a id="btnLogin" class="btn btn-primary">Login</a>
 				<a id="btnLogout" class="btn btn-primary">Logout</a>
+				<hr/>
+				<a id="btnGetTeams" class="btn btn-primary">Get Teams</a>
 			</div>
 			<div class="col-sm-8">
 				<p class="text-right">
@@ -51,7 +44,7 @@ This file is for the dev/test environment only it is not included in the final p
 		</div>
 	</div>
 	<script type="text/javascript">
-		MeetingMole.JSClientTest.Init();
+		MeetingMole.SDK.JSClientTest.Init();
 	</script>
 </body>
 </html>

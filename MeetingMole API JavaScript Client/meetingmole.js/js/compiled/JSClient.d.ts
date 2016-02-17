@@ -1,14 +1,32 @@
-declare module MeetingMole {
+declare module MeetingMole.SDK {
     /**
      * MeetingMole API JavaScript Client
      */
     class JSClient {
+        /**
+         * Constructs a new JS Client
+         * @constructor
+         * @param {string} sServerURL - The URL of the server to connect to. Must start with http:// or https://.
+         */
+        constructor(sServerURL: string);
+        /**
+         * Current Authentication parameters.
+         */
+        Authentication(): Models.IAuthenticationModel;
         private oAuthentication;
         private dtTokenExpires;
         /**
+         * Items API
+         */
+        Items: ItemService;
+        /**
+         * Teams API
+         */
+        Teams: TeamService;
+        /**
          * API Client version
          */
-        Version(): string;
+        ClientVersion(): string;
         /**
          * Current Server URL.
          */
@@ -24,12 +42,6 @@ declare module MeetingMole {
         IsConnected(): boolean;
         private bIsConnected;
         /**
-         * Constructs a new JS Client
-         * @constructor
-         * @param {string} sServerURL - The URL of the server to connect to. Must start with http:// or https://.
-         */
-        constructor(sServerURL: string);
-        /**
          * Disposes the client and releases all resources. Logs out if connected.
          */
         Dispose(): void;
@@ -38,7 +50,13 @@ declare module MeetingMole {
          * @param onSuccess - Triggered on success.
          * @param onFailure - Triggered on failure.
          */
-        Ping(onSuccess: (oResult: Models.IAboutModel) => void, onFailure: (oError: Models.IErrorModel) => void): void;
+        Ping(onSuccess: (fTimeTaken_ms: number) => void, onFailure: (oError: Models.IErrorModel) => void): void;
+        /**
+         * Gets server version info.
+         * @param onSuccess
+         * @param onFailure
+         */
+        GetVersionInfo(onSuccess: (oResult: Models.IVersionInfo) => void, onFailure: (oError: Models.IErrorModel) => void): void;
         /**
          * Checks if the current authentication token is still valid
          * @param onSuccess
@@ -69,8 +87,22 @@ declare module MeetingMole {
          */
         LoginWithToken(sUsername: string, sAccessToken: string, sClientSecret: string, onSuccess: () => void, onFailure: (oError: Models.IErrorModel) => void): void;
         private resetAuthentication();
-        private handleError(response);
-        private handleProtocolError(response);
+        /**
+         * Checks if the server returned a managed error and handles it if so.
+         * @param response - response received from the server.
+         * @param sStatusText - status text.
+         * @param jqXHR - associated jquery xhr handler.
+         * @returns - null if no error, otherwise an error object.
+         */
+        HandleError(response: any, sStatusText: string, jqXHR: JQueryXHR): Models.IErrorModel;
+        /**
+         * Handles an ajax request protocol error.
+         * @param response
+         * @param sStatusText
+         * @param jqXHR
+         * @param callBack
+         */
+        HandleProtocolError(response: any, sStatusText: string, jqXHR: JQueryXHR, callBack: (oError: Models.IErrorModel) => void): void;
         private generateClientSecret();
         private generateRandomString(iLength);
     }

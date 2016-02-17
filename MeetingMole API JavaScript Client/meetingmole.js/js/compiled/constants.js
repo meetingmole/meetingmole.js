@@ -13,13 +13,19 @@ var MeetingMole;
          */
         Constants.BaseURL = "/publicapi/v1/";
         /**
-         * API action URLs
+         * Access API action URLs
          */
-        Constants.APIURLs = {
+        Constants.AccessAPIURLs = {
             SimpleLogin: "access/simplelogin",
             About: "access/about",
-            CheckToken: "access/simplelogin",
+            CheckToken: "access/checktoken",
             Logout: "access/logout"
+        };
+        /**
+         * Team API action URLs
+         */
+        Constants.TeamAPIURLs = {
+            GetAll: "team/getall"
         };
     })(Constants = MeetingMole.Constants || (MeetingMole.Constants = {}));
 })(MeetingMole || (MeetingMole = {}));

@@ -1,4 +1,4 @@
-declare module MeetingMole.JSClientTest {
+declare module MeetingMole.SDK.JSClientTest {
     /**
      * Inits the test app
      */

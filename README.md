@@ -17,7 +17,7 @@ Log in to your MeetingMole account and enter the Team Admin. Under Team Settings
 ###Use with JavaScript:
 ```javascript
 // Create client
-var oClient = new MeetingMole.JSClient( "https://meetingmole.com" );
+var oClient = new MeetingMole.SDK.JSClient( "https://meetingmole.com" );
 // Login (individual auth)
 oClient.Login("test@test.test", "test", function(){ 
 	// Logged in
@@ -31,7 +31,7 @@ oClient.Login("test@test.test", "test", function(){
 ###Use with TypeScript:
 The definitions can be found under "/package/ts/meetingmole.d.ts". 
 ```typescript
-var oClient : MeetingMole.JSClient = new MeetingMole.JSClient( "https://meetingmole.com" );
+var oClient : MeetingMole.SDK.JSClient = new MeetingMole.SDK.JSClient( "https://meetingmole.com" );
 // Login (individual auth)
 oClient.Login("test@test.test", "test", ()=>{ 
 	// Logged in
@@ -49,6 +49,4 @@ oClient.Login("test@test.test", "test", ()=>{
 
 ___
 
-Copyright (c) 2015-2016 MeetingMole GmbH. All Rights Reserved.
-
-[http://meetingmole.com](http://meetingmole.com)
+Copyright (c) 2015-2016 MeetingMole GmbH. All Rights Reserved. [http://meetingmole.com](http://meetingmole.com)

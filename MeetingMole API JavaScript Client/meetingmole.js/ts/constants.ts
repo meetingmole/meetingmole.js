@@ -11,12 +11,18 @@ module MeetingMole.Constants
 	 */
 	export var BaseURL: string = "/publicapi/v1/";
 	/**
-	 * API action URLs
+	 * Access API action URLs
 	 */
-	export var APIURLs = {
+	export var AccessAPIURLs = {
 		SimpleLogin: "access/simplelogin",
 		About: "access/about",
-		CheckToken: "access/simplelogin",
+		CheckToken: "access/checktoken",
 		Logout: "access/logout"
+	};
+	/**
+	 * Team API action URLs
+	 */
+	export var TeamAPIURLs = {
+		GetAll: "team/getall"
 	};
 }
