@@ -31,6 +31,7 @@
     <Content Include="js\compiled\ItemService.js" />
     <Content Include="js\compiled\JSClient.js" />
     <Content Include="js\compiled\models.js" />
+    <Content Include="js\compiled\TeamService.js" />
     <Content Include="js\min\meetingmole.js" />
     <Content Include="vendor\bootstrap\css\bootstrap-theme.css" />
     <Content Include="vendor\bootstrap\css\bootstrap-theme.min.css" />
@@ -69,6 +70,7 @@
     <Content Include="js\compiled\models.js.map" />
     <Content Include="js\compiled\JSClient.js.map" />
     <Content Include="js\compiled\ItemService.js.map" />
+    <Content Include="js\compiled\TeamService.js.map" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
