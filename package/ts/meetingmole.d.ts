@@ -19,6 +19,8 @@ declare module MeetingMole {
      * MeetingMole API JavaScript Client
      */
     class JSClient {
+        private oAuthentication;
+        private dtTokenExpires;
         /**
          * API Client version
          */
@@ -32,7 +34,6 @@ declare module MeetingMole {
          * Username of the currently logged in user. Null if not logged in.
          */
         Username(): string;
-        private sUsername;
         /**
          * True if the client is connected and authenticated
          */
@@ -55,6 +56,12 @@ declare module MeetingMole {
          */
         Ping(onSuccess: (oResult: Models.IAboutModel) => void, onFailure: (oError: Models.IErrorModel) => void): void;
         /**
+         * Checks if the current authentication token is still valid
+         * @param onSuccess
+         * @param onFailure
+         */
+        CheckToken(onSuccess: () => void, onFailure: (oError: Models.IErrorModel) => void): void;
+        /**
          * Logs the user out
          * @param onSuccess
          * @param onFailure
@@ -67,9 +74,21 @@ declare module MeetingMole {
          * @param onSuccess
          * @param onFailure
          */
-        Login(sUsername: string, sPassword: string, onSuccess: (oResult: Models.IAboutModel) => void, onFailure: (oError: Models.IErrorModel) => void): void;
+        Login(sUsername: string, sPassword: string, onSuccess: () => void, onFailure: (oError: Models.IErrorModel) => void): void;
+        /**
+         * Logs the user in with a previously stored client token/secret. Does nothing if already logged in.
+         * @param {string} sUsername
+         * @param {string} sAccessToken
+         * @param {string} sClientSecret
+         * @param onSuccess
+         * @param onFailure
+         */
+        LoginWithToken(sUsername: string, sAccessToken: string, sClientSecret: string, onSuccess: () => void, onFailure: (oError: Models.IErrorModel) => void): void;
+        private resetAuthentication();
         private handleError(response);
         private handleProtocolError(response);
+        private generateClientSecret();
+        private generateRandomString(iLength);
     }
 }
 
@@ -102,5 +121,13 @@ declare module MeetingMole.Models {
          * Time on server at the time of request.
          */
         ServerTime: Date;
+    }
+    /**
+     * Authentication (verification) package
+     */
+    interface IAuthenticationModel {
+        Username: string;
+        AccessToken: string;
+        ClientSecret: string;
     }
 }

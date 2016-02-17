@@ -19,7 +19,7 @@ var MeetingMole;
             SimpleLogin: "access/simplelogin",
             About: "access/about",
             CheckToken: "access/simplelogin",
-            Logout: "access/logout",
+            Logout: "access/logout"
         };
     })(Constants = MeetingMole.Constants || (MeetingMole.Constants = {}));
 })(MeetingMole || (MeetingMole = {}));

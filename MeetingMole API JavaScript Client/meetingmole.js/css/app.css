@@ -75,3 +75,7 @@ pre
 {
 	color: red;
 }
+
+.form-control {
+	margin-bottom: 2px;
+}

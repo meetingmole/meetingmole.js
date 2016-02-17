@@ -28,4 +28,12 @@ declare module MeetingMole.Models {
          */
         ServerTime: Date;
     }
+    /**
+     * Authentication (verification) package
+     */
+    interface IAuthenticationModel {
+        Username: string;
+        AccessToken: string;
+        ClientSecret: string;
+    }
 }

@@ -1,26 +1,29 @@
 {
-	"tags": {
-		"allowUnknownTags": true,
-		"dictionaries": [ "jsdoc", "closure" ]
-	},
 	"source": {
-		"include": [ "js/compiled/meetingmole.js" ],
-		"exclude": [ "js/compiled/app.js" ],
-		"includePattern": ".+\\.js(doc)?$",
-		"excludePattern": "(^|\\/|\\\\)_"
+		"includePattern": "(\\.d)?\\.ts$"
 	},
-	"plugins": [ ],
-	"templates": {
-		"cleverLinks": false,
-		"monospaceLinks": false
-	},
+	"plugins": [
+		"node_modules/ts2jsdoc/plugin.js"
+	],
 	"opts": {
-		//"template": "templates/default", // same as -t templates/default
-		//"encoding": "utf8", // same as -e utf8
-		"destination": "./doc/", // same as -d ./out/
-		"recurse": true, // same as -r
-		"package": "./package.json"
-		//"tutorials": "path/to/tutorials" // same as -u path/to/tutorials
+		"template": "node_modules/ts2jsdoc/template"
+	},
+	"typescript": {
+		"target": "es5",
+		"module": "amd"
+	},
+	"templates": {
+		"systemName": "meetingmole.js",
+		"theme": "default",
+		"navType": "vertical",
+		"inverseNav": false,
+		"tableOfContents": true,
+		"linenums": false,
+		"collapseSymbols": true,
+		"footer": "string",
+		"copyright": "string",
+		"analytics": "",
+		"outputSourceFiles": "false",
+		"outputSourcePath": "false"
 	}
-	
 }

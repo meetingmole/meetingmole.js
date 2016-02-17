@@ -9,9 +9,10 @@ module MeetingMole.Models
 	/**
 	 * API Error
 	 */
-	export interface IErrorModel {
-		HttpErrorCode:number;
-		Error:string;
+	export interface IErrorModel
+	{
+		HttpErrorCode: number;
+		Error: string;
 		ErrorDetails: string;
 	}
 
@@ -39,5 +40,15 @@ module MeetingMole.Models
 		 * Time on server at the time of request.
 		 */
 		ServerTime: Date;
+	}
+
+	/**
+	 * Authentication (verification) package
+	 */
+	export interface IAuthenticationModel
+	{
+		Username: string;
+		AccessToken: string;
+		ClientSecret: string;
 	}
 }

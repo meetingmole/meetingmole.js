@@ -16,8 +16,9 @@ var MeetingMole;
          * @param {string} sServerURL - The URL of the server to connect to. Must start with http:// or https://.
          */
         function JSClient(sServerURL) {
+            this.oAuthentication = null;
+            this.dtTokenExpires = null;
             this.sServerURL = null;
-            this.sUsername = null;
             this.bIsConnected = false;
             if (!sServerURL) {
                 throw "Parameter sServerURL must be defined.";
@@ -48,10 +49,10 @@ var MeetingMole;
          * Username of the currently logged in user. Null if not logged in.
          */
         JSClient.prototype.Username = function () {
-            if (!this.bIsConnected) {
+            if (!this.bIsConnected || !this.oAuthentication) {
                 return null;
             }
-            return this.sUsername;
+            return this.oAuthentication.Username;
         };
         /**
          * True if the client is connected and authenticated
@@ -95,6 +96,40 @@ var MeetingMole;
             });
         };
         /**
+         * Checks if the current authentication token is still valid
+         * @param onSuccess
+         * @param onFailure
+         */
+        JSClient.prototype.CheckToken = function (onSuccess, onFailure) {
+            var _this = this;
+            if (!this.IsConnected()) {
+                return;
+            }
+            $.ajax({
+                url: this.sServerURL + MeetingMole.Constants.APIURLs.CheckToken,
+                data: {
+                    Authentication: this.oAuthentication
+                },
+                method: "post",
+                timeout: 30000,
+                cache: false,
+                success: function (response) {
+                    var oError = _this.handleError(response);
+                    if (oError) {
+                        onFailure(oError);
+                        return;
+                    }
+                    // Update token expiry
+                    _this.dtTokenExpires = response.TokenExpires;
+                    onSuccess();
+                },
+                error: function (response) {
+                    var oError = _this.handleProtocolError(response);
+                    onFailure(oError);
+                }
+            });
+        };
+        /**
          * Logs the user out
          * @param onSuccess
          * @param onFailure
@@ -105,7 +140,11 @@ var MeetingMole;
                 return;
             }
             $.ajax({
-                url: MeetingMole.Constants.BaseURL + MeetingMole.Constants.APIURLs.Logout,
+                url: this.sServerURL + MeetingMole.Constants.APIURLs.Logout,
+                data: {
+                    Authentication: this.oAuthentication,
+                    InvalidateAllTokens: false
+                },
                 method: "post",
                 timeout: 30000,
                 cache: false,
@@ -115,8 +154,7 @@ var MeetingMole;
                         onFailure(oError);
                         return;
                     }
-                    _this.sUsername = null;
-                    _this.bIsConnected = false;
+                    _this.resetAuthentication();
                     onSuccess(response);
                 },
                 error: function (response) {
@@ -137,30 +175,98 @@ var MeetingMole;
             if (this.IsConnected()) {
                 return;
             }
+            this.resetAuthentication();
+            // Roll a new client secret
+            this.oAuthentication = {
+                Username: sUsername,
+                ClientSecret: this.generateClientSecret(),
+                AccessToken: null
+            };
             $.ajax({
-                url: MeetingMole.Constants.BaseURL + MeetingMole.Constants.APIURLs.Logout,
+                url: this.sServerURL + MeetingMole.Constants.APIURLs.SimpleLogin,
+                data: {
+                    Username: this.oAuthentication.Username,
+                    Password: sPassword,
+                    ClientSecret: this.oAuthentication.ClientSecret
+                },
                 method: "post",
-                timeout: 30000,
+                timeout: 60000,
                 cache: false,
                 success: function (response, sStatusText, b) {
                     //console.log(sStatusText);
                     console.log(b);
                     var oError = _this.handleError(response);
                     if (oError) {
+                        _this.resetAuthentication();
                         onFailure(oError);
                         return;
                     }
-                    _this.sUsername = sUsername;
-                    _this.bIsConnected = false;
-                    onSuccess(response);
+                    _this.bIsConnected = true;
+                    _this.oAuthentication.AccessToken = response.AccessToken;
+                    _this.dtTokenExpires = response.TokenExpires;
+                    onSuccess();
                 },
                 error: function (response, a, b) {
+                    _this.resetAuthentication();
                     console.log(a);
                     console.log(b);
                     var oError = _this.handleProtocolError(response);
                     onFailure(oError);
                 }
             });
+        };
+        /**
+         * Logs the user in with a previously stored client token/secret. Does nothing if already logged in.
+         * @param {string} sUsername
+         * @param {string} sAccessToken
+         * @param {string} sClientSecret
+         * @param onSuccess
+         * @param onFailure
+         */
+        JSClient.prototype.LoginWithToken = function (sUsername, sAccessToken, sClientSecret, onSuccess, onFailure) {
+            var _this = this;
+            if (this.IsConnected()) {
+                return;
+            }
+            this.resetAuthentication();
+            // Try to login with the existing token
+            this.oAuthentication = {
+                Username: sUsername,
+                ClientSecret: sClientSecret,
+                AccessToken: sAccessToken
+            };
+            $.ajax({
+                url: this.sServerURL + MeetingMole.Constants.APIURLs.CheckToken,
+                data: this.oAuthentication,
+                method: "post",
+                timeout: 60000,
+                cache: false,
+                success: function (response, sStatusText, b) {
+                    //console.log(sStatusText);
+                    console.log(b);
+                    var oError = _this.handleError(response);
+                    if (oError) {
+                        _this.resetAuthentication();
+                        onFailure(oError);
+                        return;
+                    }
+                    _this.bIsConnected = true;
+                    _this.dtTokenExpires = response.TokenExpires;
+                    onSuccess();
+                },
+                error: function (response, a, b) {
+                    _this.resetAuthentication();
+                    console.log(a);
+                    console.log(b);
+                    var oError = _this.handleProtocolError(response);
+                    onFailure(oError);
+                }
+            });
+        };
+        JSClient.prototype.resetAuthentication = function () {
+            this.bIsConnected = false;
+            this.oAuthentication = null;
+            this.dtTokenExpires = null;
         };
         JSClient.prototype.handleError = function (response) {
             if (!response) {
@@ -200,8 +306,19 @@ var MeetingMole;
                 HttpErrorCode: iErrorCode,
                 Error: sError,
                 // TODO:
-                ErrorDetails: "TODO:"
+                ErrorDetails: ""
             };
+        };
+        JSClient.prototype.generateClientSecret = function () {
+            return this.generateRandomString(64);
+        };
+        JSClient.prototype.generateRandomString = function (iLength) {
+            var sString = "";
+            var sAllowedChars = "<>|^*~!#?-_.,:;¤%&/()={[]}\\\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            for (var i = 0; i < iLength; i++) {
+                sString += sAllowedChars.charAt(Math.floor(Math.random() * sString.length));
+            }
+            return sString;
         };
         return JSClient;
     })();

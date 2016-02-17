@@ -5,6 +5,8 @@ This file is for the dev/test environment only. It is not included in the final 
 module MeetingMole.JSClientTest {
 	var jqResultsDisplay: JQuery = null;
 	var jqPingButton: JQuery = null;
+	var jqLoginButton: JQuery = null;
+	var jqLogoutButton: JQuery = null;
 	var jqServerURL: JQuery = null;
 	var jqClearLogButton: JQuery = null;
 	var oClient: JSClient = null;
@@ -14,6 +16,8 @@ module MeetingMole.JSClientTest {
 	 */
 	export function Init(): void {
 		jqPingButton = $("#btnPing");
+		jqLoginButton = $("#btnLogin");
+		jqLogoutButton = $("#btnLogout");
 		jqResultsDisplay= $("#divResponseDisplay");
 		jqServerURL = $("#txServerURL");
 		jqClearLogButton = $("#btnClearLog");
@@ -51,6 +55,50 @@ module MeetingMole.JSClientTest {
 				log("Ping failed.");
 				log("Error: " + syntaxHighlight(oError),LogTypes.Error);
 			});
+		});
+		jqLoginButton.off("click").on("click", () =>
+		{
+			if(!oClient)
+			{
+				log("Not connected to server. Please define server URL to connect to.", LogTypes.Error);
+				return;
+			}
+			if(oClient.IsConnected())
+			{
+				log("Already logged in.", LogTypes.Normal);
+				return;
+			}
+			log("Logging in to " + oClient.ServerURL() + "...");
+			oClient.Login($("#txLogin").val(), $("#txPassword").val(),() =>
+			{
+				log("Login success!", LogTypes.Success);
+			}, (oError) =>
+			{
+				log("Login failed.");
+				log("Error: " + syntaxHighlight(oError), LogTypes.Error);
+			});
+		});
+		jqLogoutButton.off("click").on("click", () =>
+		{
+			if(!oClient)
+			{
+				log("Not connected to server. Please define server URL to connect to.", LogTypes.Error);
+				return;
+			}
+			if(!oClient.IsConnected())
+			{
+				log("Not logged in. Please log in first.", LogTypes.Error);
+				return;
+			}
+			log("Logging out from " + oClient.ServerURL() + "...");
+			oClient.Logout(() =>
+			{
+				log("You have been logged out.", LogTypes.Success);
+			}, (oError) =>
+				{
+					log("Logout failed.");
+					log("Error: " + syntaxHighlight(oError), LogTypes.Error);
+				});
 		});
 	}
 

@@ -17,7 +17,6 @@ module MeetingMole.Constants
 		SimpleLogin: "access/simplelogin",
 		About: "access/about",
 		CheckToken: "access/simplelogin",
-		Logout: "access/logout",
-
+		Logout: "access/logout"
 	};
 }

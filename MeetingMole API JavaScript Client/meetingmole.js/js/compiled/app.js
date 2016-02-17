@@ -8,6 +8,8 @@ var MeetingMole;
     (function (JSClientTest) {
         var jqResultsDisplay = null;
         var jqPingButton = null;
+        var jqLoginButton = null;
+        var jqLogoutButton = null;
         var jqServerURL = null;
         var jqClearLogButton = null;
         var oClient = null;
@@ -16,6 +18,8 @@ var MeetingMole;
          */
         function Init() {
             jqPingButton = $("#btnPing");
+            jqLoginButton = $("#btnLogin");
+            jqLogoutButton = $("#btnLogout");
             jqResultsDisplay = $("#divResponseDisplay");
             jqServerURL = $("#txServerURL");
             jqClearLogButton = $("#btnClearLog");
@@ -47,6 +51,40 @@ var MeetingMole;
                     log("Response:" + syntaxHighlight(oResult), LogTypes.Indent);
                 }, function (oError) {
                     log("Ping failed.");
+                    log("Error: " + syntaxHighlight(oError), LogTypes.Error);
+                });
+            });
+            jqLoginButton.off("click").on("click", function () {
+                if (!oClient) {
+                    log("Not connected to server. Please define server URL to connect to.", LogTypes.Error);
+                    return;
+                }
+                if (oClient.IsConnected()) {
+                    log("Already logged in.", LogTypes.Normal);
+                    return;
+                }
+                log("Logging in to " + oClient.ServerURL() + "...");
+                oClient.Login($("#txLogin").val(), $("#txPassword").val(), function () {
+                    log("Login success!", LogTypes.Success);
+                }, function (oError) {
+                    log("Login failed.");
+                    log("Error: " + syntaxHighlight(oError), LogTypes.Error);
+                });
+            });
+            jqLogoutButton.off("click").on("click", function () {
+                if (!oClient) {
+                    log("Not connected to server. Please define server URL to connect to.", LogTypes.Error);
+                    return;
+                }
+                if (!oClient.IsConnected()) {
+                    log("Not logged in. Please log in first.", LogTypes.Error);
+                    return;
+                }
+                log("Logging out from " + oClient.ServerURL() + "...");
+                oClient.Logout(function () {
+                    log("You have been logged out.", LogTypes.Success);
+                }, function (oError) {
+                    log("Logout failed.");
                     log("Error: " + syntaxHighlight(oError), LogTypes.Error);
                 });
             });

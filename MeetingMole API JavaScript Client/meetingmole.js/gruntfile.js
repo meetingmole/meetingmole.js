@@ -1,4 +1,4 @@
-﻿/// <binding AfterBuild='cssmin:all, uglify:all, typedoc:all, copypackage' ProjectOpened='bower:install' />
+﻿/// <binding AfterBuild='createpackage' ProjectOpened='bower:install' />
 module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON("package.json"),
@@ -58,17 +58,6 @@ module.exports = function (grunt) {
 				]
 			}
 		},
-		typedoc: {
-			all: {
-				options: {
-					module: "commonjs",
-					target: "es5",
-					out: "doc/",
-					name: "meetingmole.js"
-				},
-				src: ["ts/**/*.ts", "typings/browser.d.ts", "!ts/app.ts"]
-			}
-		},
 		clean: {
 			options: { force: true },
 			'package': "../../package"
@@ -98,19 +87,27 @@ module.exports = function (grunt) {
 				}
 			}
 		}
+		/*,
+		jsdoc: {
+			all: {
+				src: ["ts/*.ts", "!ts/*.d.ts"],
+				options: {
+					destination: 'doc',
+					configure:"jsdoc.conf.json"
+				}
+			}
+		}*/
 	});
 
 	grunt.loadNpmTasks("grunt-bower-task");
 	grunt.loadNpmTasks("grunt-contrib-clean");
 	grunt.loadNpmTasks("grunt-contrib-copy");
 	grunt.loadNpmTasks("grunt-contrib-uglify");
-	//grunt.loadNpmTasks("grunt-contrib-compress");
 	grunt.loadNpmTasks("grunt-contrib-cssmin");
 	grunt.loadNpmTasks("grunt-contrib-concat");
-	grunt.loadNpmTasks("grunt-typedoc");
+	//grunt.loadNpmTasks("grunt-jsdoc");
 
 	// Register alias tasks
-	grunt.registerTask("all", ["bower:install", "cssmin:all", "uglify:all", "typedoc:all"]);
-	grunt.registerTask("createpackage", ["all", "copy:package"]);
-	grunt.registerTask("copypackage", ["clean:package", "copy:package", "concat:definitions"]);
+	grunt.registerTask("createpackage", ["cssmin:all", "uglify:all", "clean:package", "copy:package", "concat:definitions" ]);
+	grunt.registerTask("all", ["bower:install", "createpackage"]);
 };
