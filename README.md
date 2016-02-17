@@ -1,35 +1,44 @@
 # meetingmole.js
 ##JavaScript Client for MeetingMole API 
 
-This is a JavaScript client library for accessing the MeetingMole Public API. The use of the library requires a valid Team account at MeetingMole server. You can use with individual authentication (username/password), or an API key. For details of available plans, see [http://meetingmole.com](http://meetingmole.com).
+This is a JavaScript client library for accessing the MeetingMole Public API. The use of the library requires a valid Team license at a MeetingMole server. You can connect to the API using individual authentication (username/password), or an API key. For details of available plans, see [http://meetingmole.com](http://meetingmole.com).
 
 ###Install: 
 ```
 bower install meetingmole.js --save
 ```
-Or use the file *"meetingmole.js"* under the "/package" directory in this repo.
+Or just copy the file *"/package/min/meetingmole.js"* in this repo to your project.
 
 
 ###Configure:
 Log in to your MeetingMole account and enter the Team Admin. Under Team Settings / API Keys, enable API access and generate the required API Keys.
 
 
-###Use with JavaScript:
-```javascript
-// Create client
-var oClient = new MeetingMole.SDK.JSClient( "https://meetingmole.com" );
-// Login (individual auth)
-oClient.Login("test@test.test", "test", function(){ 
-	// Logged in
-	oClient.GetItems(...);
-	...
-}, function( oError ){
-	// Fail
-});
+###Use:
+```html
+<html>
+<head>
+	<script src="meetingmole.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+	// Create client
+	var oClient = new MeetingMole.SDK.JSClient( "https://meetingmole.com" );
+	// Login (individual auth)
+	oClient.Login("test@test.test", "test", function() { 
+		// Logged in
+		oClient.GetItems(...);
+		...
+	}, function( oError ) {
+		// Fail
+	});
+</script>
+</body>
+</html>
 ```
 
 ###Use with TypeScript:
-The definitions can be found under "/package/ts/meetingmole.d.ts". 
+The type definitions can be found in this repo under *"/package/ts/meetingmole.d.ts"*. 
 ```typescript
 var oClient : MeetingMole.SDK.JSClient = new MeetingMole.SDK.JSClient( "https://meetingmole.com" );
 // Login (individual auth)
