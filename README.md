@@ -56,6 +56,10 @@ oClient.Login("test@test.test", "test", ()=>{
 + MeetingMole Public API Reference: [http://meetingmole.com/swagger](http://meetingmole.com/swagger)
 + MeetingMole API JavaScript Client Reference: [http://meetingmole.com](http://meetingmole.com)
 
+###Change log:
+####1.0.2 - in development
++ Initial functional public release.
+
 ___
 
 Copyright (c) 2015-2016 MeetingMole GmbH. All Rights Reserved. [http://meetingmole.com](http://meetingmole.com)
