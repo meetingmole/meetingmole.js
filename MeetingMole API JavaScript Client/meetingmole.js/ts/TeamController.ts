@@ -46,5 +46,36 @@ module MeetingMole.SDK
 			});
 			
 		}
+
+		/**
+		 * Gets a team by ID.
+		 */
+		public Get(iTeamID:number,onSuccess: (oTeam: Models.ITeam) => void, onFailure: (oError: Models.IErrorModel) => void): void
+		{
+			$.ajax({
+				url: this.oClient.ServerURL() + Constants.TeamsAPIURLs.Get,
+				data: {
+					Authentication: this.oClient.Authentication()
+				},
+				method: "post",
+				timeout: 30000,
+				cache: false,
+				success: (response: any, sStatusText: string, jqXHR: JQueryXHR) =>
+				{
+					var oError = this.oClient.HandleError(response, sStatusText, jqXHR);
+					if(oError)
+					{
+						onFailure(oError);
+						return;
+					}
+					onSuccess(response);
+				},
+				error: (jqXHR: JQueryXHR, sStatusText: string, sResponse: string) =>
+				{
+					this.oClient.HandleProtocolError(sResponse, sStatusText, jqXHR, onFailure);
+				}
+			});
+
+		}
 	}
 }

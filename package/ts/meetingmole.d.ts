@@ -141,6 +141,10 @@ declare module MeetingMole.SDK {
          * Gets all teams the current user has access to.
          */
         GetAll(onSuccess: (aTeams: Models.ITeam[]) => void, onFailure: (oError: Models.IErrorModel) => void): void;
+        /**
+         * Gets a team by ID.
+         */
+        Get(iTeamID: number, onSuccess: (oTeam: Models.ITeam) => void, onFailure: (oError: Models.IErrorModel) => void): void;
     }
 }
 
@@ -183,6 +187,7 @@ declare module MeetingMole.SDK.Constants {
      * Teams API action URLs
      */
     var TeamsAPIURLs: {
+        Get: string;
         GetAll: string;
     };
     /**
@@ -311,7 +316,7 @@ declare module MeetingMole.SDK.Models {
         /**
          * ID of the team.
          */
-        ID: number;
+        TeamID: number;
         /**
          * Name of the team.
          */

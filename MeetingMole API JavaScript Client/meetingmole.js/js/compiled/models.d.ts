@@ -91,7 +91,7 @@ declare module MeetingMole.SDK.Models {
         /**
          * ID of the team.
          */
-        ID: number;
+        TeamID: number;
         /**
          * Name of the team.
          */

@@ -27,6 +27,7 @@ var MeetingMole;
              * Teams API action URLs
              */
             Constants.TeamsAPIURLs = {
+                Get: "teams/get",
                 GetAll: "teams/getall"
             };
             /**

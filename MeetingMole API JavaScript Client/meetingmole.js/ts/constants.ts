@@ -25,6 +25,7 @@ module MeetingMole.SDK.Constants
 	 * Teams API action URLs
 	 */
 	export var TeamsAPIURLs = {
+		Get: "teams/get",
 		GetAll: "teams/getall"
 	};
 

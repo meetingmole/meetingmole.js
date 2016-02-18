@@ -41,6 +41,32 @@ var MeetingMole;
                     }
                 });
             };
+            /**
+             * Gets a team by ID.
+             */
+            TeamController.prototype.Get = function (iTeamID, onSuccess, onFailure) {
+                var _this = this;
+                $.ajax({
+                    url: this.oClient.ServerURL() + SDK.Constants.TeamsAPIURLs.Get,
+                    data: {
+                        Authentication: this.oClient.Authentication()
+                    },
+                    method: "post",
+                    timeout: 30000,
+                    cache: false,
+                    success: function (response, sStatusText, jqXHR) {
+                        var oError = _this.oClient.HandleError(response, sStatusText, jqXHR);
+                        if (oError) {
+                            onFailure(oError);
+                            return;
+                        }
+                        onSuccess(response);
+                    },
+                    error: function (jqXHR, sStatusText, sResponse) {
+                        _this.oClient.HandleProtocolError(sResponse, sStatusText, jqXHR, onFailure);
+                    }
+                });
+            };
             return TeamController;
         })();
         SDK.TeamController = TeamController;
