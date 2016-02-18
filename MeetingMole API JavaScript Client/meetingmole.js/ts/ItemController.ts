@@ -1,14 +1,15 @@
-﻿module MeetingMole.SDK
+﻿"use strict";
+module MeetingMole.SDK
 {
 	/**
-	 * Handler for the Item Service API
+	 * Handler for the Items API. These actions require client login first.
 	 */
-	export class ItemService
+	export class ItemController
 	{
 		private oClient:JSClient = null;
 
 		/**
-		 * Constructs new item service handler.
+		 * Constructs new Items API handler.
 		 * @param oClient - Client to use for the service.
 		 */
 		constructor(oClient:JSClient) {

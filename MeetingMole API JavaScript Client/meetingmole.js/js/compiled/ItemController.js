@@ -1,22 +1,23 @@
+"use strict";
 var MeetingMole;
 (function (MeetingMole) {
     var SDK;
     (function (SDK) {
         /**
-         * Handler for the Item Service API
+         * Handler for the Items API. These actions require client login first.
          */
-        var ItemService = (function () {
+        var ItemController = (function () {
             /**
-             * Constructs new item service handler.
+             * Constructs new Items API handler.
              * @param oClient - Client to use for the service.
              */
-            function ItemService(oClient) {
+            function ItemController(oClient) {
                 this.oClient = null;
                 this.oClient = oClient;
             }
-            return ItemService;
+            return ItemController;
         })();
-        SDK.ItemService = ItemService;
+        SDK.ItemController = ItemController;
     })(SDK = MeetingMole.SDK || (MeetingMole.SDK = {}));
 })(MeetingMole || (MeetingMole = {}));
-//# sourceMappingURL=ItemService.js.map
+//# sourceMappingURL=ItemController.js.map

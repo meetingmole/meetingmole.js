@@ -28,10 +28,11 @@
     <Content Include="index.html" />
     <Content Include="js\compiled\app.js" />
     <Content Include="js\compiled\constants.js" />
-    <Content Include="js\compiled\ItemService.js" />
+    <Content Include="js\compiled\ItemController.js" />
     <Content Include="js\compiled\JSClient.js" />
     <Content Include="js\compiled\models.js" />
-    <Content Include="js\compiled\TeamService.js" />
+    <Content Include="js\compiled\TeamController.js" />
+    <Content Include="js\compiled\WidgetController.js" />
     <Content Include="js\min\meetingmole.js" />
     <Content Include="vendor\bootstrap\css\bootstrap-theme.css" />
     <Content Include="vendor\bootstrap\css\bootstrap-theme.min.css" />
@@ -47,8 +48,9 @@
   <ItemGroup>
     <None Include="jsdoc.conf.json" />
     <TypeScriptCompile Include="ts\app.ts" />
-    <TypeScriptCompile Include="ts\TeamService.ts" />
-    <TypeScriptCompile Include="ts\ItemService.ts" />
+    <TypeScriptCompile Include="ts\WidgetController.ts" />
+    <TypeScriptCompile Include="ts\TeamController.ts" />
+    <TypeScriptCompile Include="ts\ItemController.ts" />
     <TypeScriptCompile Include="ts\models.ts" />
     <TypeScriptCompile Include="ts\constants.ts" />
     <TypeScriptCompile Include="ts\JSClient.ts" />
@@ -69,8 +71,9 @@
     <Content Include="js\compiled\constants.js.map" />
     <Content Include="js\compiled\models.js.map" />
     <Content Include="js\compiled\JSClient.js.map" />
-    <Content Include="js\compiled\ItemService.js.map" />
-    <Content Include="js\compiled\TeamService.js.map" />
+    <Content Include="js\compiled\ItemController.js.map" />
+    <Content Include="js\compiled\TeamController.js.map" />
+    <Content Include="js\compiled\WidgetController.js.map" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

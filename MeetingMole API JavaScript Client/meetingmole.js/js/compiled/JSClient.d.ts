@@ -16,13 +16,17 @@ declare module MeetingMole.SDK {
         private oAuthentication;
         private dtTokenExpires;
         /**
-         * Items API
+         * Items API. Item actions require client login first.
          */
-        Items: ItemService;
+        Items: ItemController;
         /**
-         * Teams API
+         * Teams API. Team actions require client login first.
          */
-        Teams: TeamService;
+        Teams: TeamController;
+        /**
+         * Widgets API. Widget actions do not require client login.
+         */
+        Widgets: WidgetController;
         /**
          * API Client version
          */

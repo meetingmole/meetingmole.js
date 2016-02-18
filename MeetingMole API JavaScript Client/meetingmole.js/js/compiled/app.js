@@ -123,8 +123,52 @@ var MeetingMole;
                         log("Error: " + syntaxHighlight(oError), LogTypes.Error);
                     });
                 });
+                // Wire normal click to the capture widget that rewires the capture click every time
+                $("#btnCapture").off("click").on("click", function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    wireCaptureWidget();
+                    return false;
+                });
             }
             JSClientTest.Init = Init;
+            function wireCaptureWidget() {
+                // Wire the capture widget only if all fields are filled (not testing init here)
+                var sAPIKey = $("#txCaptureWidgetAPIKey").val();
+                var sWidgetID = $("#txCaptureWidgetID").val();
+                var sTeamID = $("#txCaptureWidgetTeamID").val();
+                var iTeamID = parseInt(sTeamID, 10) || -1;
+                if (!sAPIKey || !sWidgetID || iTeamID < 1) {
+                    log("To test the widget, please define API KEY, Widget ID and Team ID first.", LogTypes.Error);
+                    return;
+                }
+                var oParams = {
+                    EmailFieldID: "txCaptureWidgetEmail",
+                    ButtonID: "btnCapture",
+                    TeamID: iTeamID,
+                    WidgetID: sWidgetID,
+                    API_KEY: sAPIKey,
+                    OnSubmit: function () {
+                        log("Capturing...");
+                        // Get from the field
+                        return null;
+                    },
+                    OnError: function (oError) {
+                        log("ERROR:", LogTypes.Error);
+                        log(syntaxHighlight(oError));
+                    },
+                    OnSuccess: function () {
+                        log("Captured!", LogTypes.Success);
+                    },
+                    OnComplete: function () {
+                        // Unwire the click so we can rewire
+                        $("#btnCapture").off("click.capturewidget");
+                    }
+                };
+                oClient.Widgets.Capture(oParams);
+                // ...and trigger the actual click right away
+                $("#btnCapture").trigger("click.capturewidget");
+            }
             /**
              * From:  http://stackoverflow.com/questions/4810841/how-can-i-pretty-print-json-using-javascript
              * @param oJSON - JSON to hilite. If not a string, will be converted to JSON string first.

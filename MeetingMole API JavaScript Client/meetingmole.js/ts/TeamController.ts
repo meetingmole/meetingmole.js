@@ -1,14 +1,15 @@
-﻿module MeetingMole.SDK
+﻿"use strict";
+module MeetingMole.SDK
 {
 	/**
-	 * Handler for the Team Service API
+	 * Handler for the Teams API. These actions require client login first.
 	 */
-	export class TeamService
+	export class TeamController
 	{
 		private oClient:JSClient = null;
 
 		/**
-		 * Constructs new team service handler.
+		 * Constructs new Teams API handler.
 		 * @param oClient - Client to use for the service.
 		 */
 		constructor(oClient:JSClient) {
@@ -21,7 +22,7 @@
 		public GetAll(onSuccess: (aTeams: Models.ITeam[]) => void, onFailure: (oError: Models.IErrorModel) => void): void
 		{
 			$.ajax({
-				url: this.oClient.ServerURL() + Constants.TeamAPIURLs.GetAll,
+				url: this.oClient.ServerURL() + Constants.TeamsAPIURLs.GetAll,
 				data: {
 					Authentication: this.oClient.Authentication()
 				},

@@ -1,26 +1,27 @@
+"use strict";
 var MeetingMole;
 (function (MeetingMole) {
     var SDK;
     (function (SDK) {
         /**
-         * Handler for the Team Service API
+         * Handler for the Teams API. These actions require client login first.
          */
-        var TeamService = (function () {
+        var TeamController = (function () {
             /**
-             * Constructs new team service handler.
+             * Constructs new Teams API handler.
              * @param oClient - Client to use for the service.
              */
-            function TeamService(oClient) {
+            function TeamController(oClient) {
                 this.oClient = null;
                 this.oClient = oClient;
             }
             /**
              * Gets all teams the current user has access to.
              */
-            TeamService.prototype.GetAll = function (onSuccess, onFailure) {
+            TeamController.prototype.GetAll = function (onSuccess, onFailure) {
                 var _this = this;
                 $.ajax({
-                    url: this.oClient.ServerURL() + MeetingMole.Constants.TeamAPIURLs.GetAll,
+                    url: this.oClient.ServerURL() + SDK.Constants.TeamsAPIURLs.GetAll,
                     data: {
                         Authentication: this.oClient.Authentication()
                     },
@@ -40,9 +41,9 @@ var MeetingMole;
                     }
                 });
             };
-            return TeamService;
+            return TeamController;
         })();
-        SDK.TeamService = TeamService;
+        SDK.TeamController = TeamController;
     })(SDK = MeetingMole.SDK || (MeetingMole.SDK = {}));
 })(MeetingMole || (MeetingMole = {}));
-//# sourceMappingURL=TeamService.js.map
+//# sourceMappingURL=TeamController.js.map

@@ -145,6 +145,52 @@ module MeetingMole.SDK.JSClientTest {
 					log("Error: " + syntaxHighlight(oError), LogTypes.Error);
 				});
 		});
+		// Wire normal click to the capture widget that rewires the capture click every time
+		$("#btnCapture").off("click").on("click", (e) => {
+			e.stopPropagation();
+			e.preventDefault();
+			wireCaptureWidget();
+			return false;
+		});
+	}
+
+	function wireCaptureWidget(): void {
+		// Wire the capture widget only if all fields are filled (not testing init here)
+		var sAPIKey = $("#txCaptureWidgetAPIKey").val();
+		var sWidgetID = $("#txCaptureWidgetID").val();
+		var sTeamID = $("#txCaptureWidgetTeamID").val();
+		var iTeamID = parseInt(sTeamID, 10) || -1;
+		if(!sAPIKey || !sWidgetID || iTeamID < 1) {
+			log("To test the widget, please define API KEY, Widget ID and Team ID first.", LogTypes.Error);
+			return;
+		}
+		var oParams: Models.ICaptureWidgetParameters = {
+			EmailFieldID: "txCaptureWidgetEmail",
+			ButtonID: "btnCapture",
+			TeamID: iTeamID,
+			WidgetID: sWidgetID,
+			API_KEY: sAPIKey,
+			OnSubmit: (): string => {
+				log("Capturing...");
+				// Get from the field
+				return null;
+			},
+			OnError: (oError) => {
+				log("ERROR:", LogTypes.Error);
+				log(syntaxHighlight(oError));
+			},
+			OnSuccess: () => {
+				log("Captured!", LogTypes.Success);
+			},
+			OnComplete: () =>
+			{
+				// Unwire the click so we can rewire
+				$("#btnCapture").off("click.capturewidget");
+			}
+		};
+		oClient.Widgets.Capture(oParams);
+		// ...and trigger the actual click right away
+		$("#btnCapture").trigger("click.capturewidget");
 	}
 
 	/**

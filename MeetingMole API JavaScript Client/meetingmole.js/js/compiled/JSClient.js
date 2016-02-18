@@ -21,29 +21,37 @@ var MeetingMole;
                 this.oAuthentication = null;
                 this.dtTokenExpires = null;
                 /**
-                 * Items API
+                 * Items API. Item actions require client login first.
                  */
                 this.Items = null;
                 /**
-                 * Teams API
+                 * Teams API. Team actions require client login first.
                  */
                 this.Teams = null;
+                /**
+                 * Widgets API. Widget actions do not require client login.
+                 */
+                this.Widgets = null;
                 this.sServerURL = null;
                 this.bIsConnected = false;
+                if (!jQuery) {
+                    throw "meetingmole.js requires jQuery.";
+                }
                 if (!sServerURL) {
-                    throw "Parameter sServerURL must be defined.";
+                    throw "meetingmole.js: Parameter sServerURL must be defined.";
                 }
                 sServerURL = sServerURL.trim();
                 if (sServerURL.indexOf("http://") !== 0
                     && sServerURL.indexOf("https://") !== 0) {
-                    throw "Parameter sServerURL must start with authority (http:// or https://).";
+                    throw "meetingmole.js: Parameter sServerURL must start with authority (http:// or https://).";
                 }
                 if (sServerURL[sServerURL.length - 1] === "/") {
                     sServerURL = sServerURL.substring(0, sServerURL.length - 1);
                 }
-                this.sServerURL = sServerURL + MeetingMole.Constants.BaseURL;
-                this.Items = new SDK.ItemService(this);
-                this.Teams = new SDK.TeamService(this);
+                this.sServerURL = sServerURL + SDK.Constants.BaseURL;
+                this.Items = new SDK.ItemController(this);
+                this.Teams = new SDK.TeamController(this);
+                this.Widgets = new SDK.WidgetController(this);
             }
             /**
              * Current Authentication parameters.
@@ -112,7 +120,7 @@ var MeetingMole;
             JSClient.prototype.GetVersionInfo = function (onSuccess, onFailure) {
                 var _this = this;
                 $.ajax({
-                    url: this.sServerURL + MeetingMole.Constants.AccessAPIURLs.About,
+                    url: this.sServerURL + SDK.Constants.AccessAPIURLs.About,
                     method: "get",
                     timeout: 30000,
                     cache: false,
@@ -146,7 +154,7 @@ var MeetingMole;
                     return;
                 }
                 $.ajax({
-                    url: this.sServerURL + MeetingMole.Constants.AccessAPIURLs.CheckToken,
+                    url: this.sServerURL + SDK.Constants.AccessAPIURLs.CheckToken,
                     data: {
                         Authentication: this.oAuthentication
                     },
@@ -179,7 +187,7 @@ var MeetingMole;
                     return;
                 }
                 $.ajax({
-                    url: this.sServerURL + MeetingMole.Constants.AccessAPIURLs.Logout,
+                    url: this.sServerURL + SDK.Constants.AccessAPIURLs.Logout,
                     data: {
                         Authentication: this.oAuthentication,
                         InvalidateAllTokens: false
@@ -221,7 +229,7 @@ var MeetingMole;
                     AccessToken: null
                 };
                 $.ajax({
-                    url: this.sServerURL + MeetingMole.Constants.AccessAPIURLs.SimpleLogin,
+                    url: this.sServerURL + SDK.Constants.AccessAPIURLs.SimpleLogin,
                     data: {
                         Username: this.oAuthentication.Username,
                         Password: sPassword,
@@ -269,7 +277,7 @@ var MeetingMole;
                     AccessToken: sAccessToken
                 };
                 $.ajax({
-                    url: this.sServerURL + MeetingMole.Constants.AccessAPIURLs.CheckToken,
+                    url: this.sServerURL + SDK.Constants.AccessAPIURLs.CheckToken,
                     data: this.oAuthentication,
                     method: "post",
                     timeout: 60000,
@@ -304,17 +312,23 @@ var MeetingMole;
              * @returns - null if no error, otherwise an error object.
              */
             JSClient.prototype.HandleError = function (response, sStatusText, jqXHR) {
-                if (!response) {
+                // Interpret "false" as a valid response, not an error.
+                if (response !== false && !response) {
                     // No response from server
                     return {
                         HttpErrorCode: 400,
                         Error: "No response received from server.",
-                        ErrorDetails: ""
+                        ErrorDetails: "",
+                        ClientErrorCode: SDK.Constants.ErrorCodes.EmptyResponse,
+                        ClientErrorConstant: SDK.Constants.ErrorCodes[SDK.Constants.ErrorCodes.EmptyResponse]
                     };
                 }
                 if (response.error) {
                     // Managed server error
-                    return response.error;
+                    var oError = response.error;
+                    oError.ClientErrorCode = SDK.Constants.ErrorCodes.ServerRejected;
+                    oError.ClientErrorConstant = SDK.Constants.ErrorCodes[SDK.Constants.ErrorCodes.ServerRejected];
+                    return oError;
                 }
                 // Not an error
                 return null;
@@ -334,7 +348,9 @@ var MeetingMole;
                     callBack({
                         HttpErrorCode: -1,
                         Error: "Unknown error",
-                        ErrorDetails: ""
+                        ErrorDetails: "",
+                        ClientErrorCode: SDK.Constants.ErrorCodes.UnknownError,
+                        ClientErrorConstant: SDK.Constants.ErrorCodes[SDK.Constants.ErrorCodes.UnknownError]
                     });
                 }
                 var iErrorCode = -1;
@@ -363,7 +379,9 @@ var MeetingMole;
                 callBack({
                     HttpErrorCode: iErrorCode,
                     Error: sError,
-                    ErrorDetails: sErrorDetails
+                    ErrorDetails: sErrorDetails,
+                    ClientErrorCode: iErrorCode > 0 ? SDK.Constants.ErrorCodes.HttpError : SDK.Constants.ErrorCodes.UnknownError,
+                    ClientErrorConstant: iErrorCode > 0 ? SDK.Constants.ErrorCodes[SDK.Constants.ErrorCodes.HttpError] : SDK.Constants.ErrorCodes[SDK.Constants.ErrorCodes.UnknownError]
                 });
             };
             JSClient.prototype.generateClientSecret = function () {

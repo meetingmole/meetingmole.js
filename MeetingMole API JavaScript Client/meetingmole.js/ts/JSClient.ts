@@ -18,25 +18,31 @@ module MeetingMole.SDK
 		 */
 		public constructor(sServerURL: string)
 		{
+			if(!jQuery)
+			{
+				throw "meetingmole.js requires jQuery.";
+			}
 			if(!sServerURL)
 			{
-				throw "Parameter sServerURL must be defined.";
+				throw "meetingmole.js: Parameter sServerURL must be defined.";
 			}
 			sServerURL = sServerURL.trim();
 			if(sServerURL.indexOf("http://") !== 0
 				&& sServerURL.indexOf("https://") !== 0
 			)
 			{
-				throw "Parameter sServerURL must start with authority (http:// or https://).";
+				throw "meetingmole.js: Parameter sServerURL must start with authority (http:// or https://).";
 			}
 			if(sServerURL[sServerURL.length - 1] === "/")
 			{
 				sServerURL = sServerURL.substring(0, sServerURL.length - 1);
 			}
 			this.sServerURL = sServerURL + Constants.BaseURL;
-			this.Items = new ItemService(this);
-			this.Teams = new TeamService(this);
+			this.Items = new ItemController(this);
+			this.Teams = new TeamController(this);
+			this.Widgets = new WidgetController(this);
 		}
+
 		/**
 		 * Current Authentication parameters.
 		 */
@@ -46,14 +52,21 @@ module MeetingMole.SDK
 		}
 		private oAuthentication: Models.IAuthenticationModel = null;
 		private dtTokenExpires: Date = null;
+
 		/**
-		 * Items API
+		 * Items API. Item actions require client login first.
 		 */
-		public Items: ItemService = null;
+		public Items: ItemController = null;
+
 		/**
-		 * Teams API
+		 * Teams API. Team actions require client login first.
 		 */
-		public Teams: TeamService = null;
+		public Teams: TeamController = null;
+
+		/**
+		 * Widgets API. Widget actions do not require client login.
+		 */
+		public Widgets: WidgetController = null;
 
 		/**
 		 * API Client version
@@ -154,7 +167,7 @@ module MeetingMole.SDK
 						};
 					onSuccess(oVersionInfo);
 				},
-				error: (jqXHR:JQueryXHR, sStatusText:string, sResponse:string ) =>
+				error: (jqXHR: JQueryXHR, sStatusText: string, sResponse: string) =>
 				{
 					this.HandleProtocolError(sResponse, sStatusText, jqXHR, onFailure);
 				}
@@ -267,9 +280,9 @@ module MeetingMole.SDK
 				method: "post",
 				timeout: 60000,
 				cache: false,
-					success: (response: any, sStatusText: string, jqXHR: JQueryXHR) =>
-					{
-						var oError = this.HandleError(response, sStatusText, jqXHR);
+				success: (response: any, sStatusText: string, jqXHR: JQueryXHR) =>
+				{
+					var oError = this.HandleError(response, sStatusText, jqXHR);
 					if(oError)
 					{
 						this.resetAuthentication();
@@ -351,21 +364,27 @@ module MeetingMole.SDK
 		 * @param jqXHR - associated jquery xhr handler.
 		 * @returns - null if no error, otherwise an error object.
 		 */
-		public HandleError(response: any, sStatusText:string,jqXHR:JQueryXHR): Models.IErrorModel
+		public HandleError(response: any, sStatusText: string, jqXHR: JQueryXHR): Models.IErrorModel
 		{
-			if(!response)
+			// Interpret "false" as a valid response, not an error.
+			if(response !== false && !response)
 			{
 				// No response from server
 				return {
 					HttpErrorCode: 400,
 					Error: "No response received from server.",
-					ErrorDetails: ""
+					ErrorDetails: "",
+					ClientErrorCode: Constants.ErrorCodes.EmptyResponse,
+					ClientErrorConstant: Constants.ErrorCodes[Constants.ErrorCodes.EmptyResponse]
 				}
 			}
 			if(response.error)
 			{
 				// Managed server error
-				return response.error;
+				var oError: Models.IErrorModel = response.error;
+				oError.ClientErrorCode = Constants.ErrorCodes.ServerRejected;
+				oError.ClientErrorConstant = Constants.ErrorCodes[Constants.ErrorCodes.ServerRejected];
+				return oError;
 			}
 			// Not an error
 			return null;
@@ -378,16 +397,19 @@ module MeetingMole.SDK
 		 * @param jqXHR
 		 * @param callBack
 		 */
-		public HandleProtocolError(response: any, sStatusText: string, jqXHR: JQueryXHR, callBack: (oError: Models.IErrorModel)=>void): void
+		public HandleProtocolError(response: any, sStatusText: string, jqXHR: JQueryXHR, callBack: (oError: Models.IErrorModel) => void): void
 		{
 			//console.log(response);
 			//console.log(sStatusText);
 			//console.log(jqXHR);
-			if(!jqXHR) {
+			if(!jqXHR)
+			{
 				callBack({
 					HttpErrorCode: -1,
 					Error: "Unknown error",
-					ErrorDetails: ""
+					ErrorDetails: "",
+					ClientErrorCode: Constants.ErrorCodes.UnknownError,
+					ClientErrorConstant: Constants.ErrorCodes[Constants.ErrorCodes.UnknownError]
 				});
 			}
 			var iErrorCode = -1;
@@ -409,8 +431,10 @@ module MeetingMole.SDK
 				}
 				if(jqXHR.responseJSON.ModelState)
 				{
-					for(var oIndexer in jqXHR.responseJSON.ModelState) {
-						if (!jqXHR.responseJSON.ModelState.hasOwnProperty(oIndexer)) {
+					for(var oIndexer in jqXHR.responseJSON.ModelState)
+					{
+						if(!jqXHR.responseJSON.ModelState.hasOwnProperty(oIndexer))
+						{
 							continue;
 						}
 						var aErrors: string[] = jqXHR.responseJSON.ModelState[oIndexer];
@@ -418,10 +442,12 @@ module MeetingMole.SDK
 					}
 				}
 			}
-			callBack( {
+			callBack({
 				HttpErrorCode: iErrorCode,
 				Error: sError,
-				ErrorDetails: sErrorDetails
+				ErrorDetails: sErrorDetails,
+				ClientErrorCode: iErrorCode > 0 ? Constants.ErrorCodes.HttpError : Constants.ErrorCodes.UnknownError,
+				ClientErrorConstant: iErrorCode > 0 ? Constants.ErrorCodes[Constants.ErrorCodes.HttpError] : Constants.ErrorCodes[Constants.ErrorCodes.UnknownError]
 			});
 		}
 

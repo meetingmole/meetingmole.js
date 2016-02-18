@@ -1,11 +1,11 @@
 declare module MeetingMole.SDK {
     /**
-     * Handler for the Team Service API
+     * Handler for the Teams API. These actions require client login first.
      */
-    class TeamService {
+    class TeamController {
         private oClient;
         /**
-         * Constructs new team service handler.
+         * Constructs new Teams API handler.
          * @param oClient - Client to use for the service.
          */
         constructor(oClient: JSClient);

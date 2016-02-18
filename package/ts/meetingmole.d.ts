@@ -1,11 +1,11 @@
 declare module MeetingMole.SDK {
     /**
-     * Handler for the Item Service API
+     * Handler for the Items API. These actions require client login first.
      */
-    class ItemService {
+    class ItemController {
         private oClient;
         /**
-         * Constructs new item service handler.
+         * Constructs new Items API handler.
          * @param oClient - Client to use for the service.
          */
         constructor(oClient: JSClient);
@@ -30,13 +30,17 @@ declare module MeetingMole.SDK {
         private oAuthentication;
         private dtTokenExpires;
         /**
-         * Items API
+         * Items API. Item actions require client login first.
          */
-        Items: ItemService;
+        Items: ItemController;
         /**
-         * Teams API
+         * Teams API. Team actions require client login first.
          */
-        Teams: TeamService;
+        Teams: TeamController;
+        /**
+         * Widgets API. Widget actions do not require client login.
+         */
+        Widgets: WidgetController;
         /**
          * API Client version
          */
@@ -124,12 +128,12 @@ declare module MeetingMole.SDK {
 
 declare module MeetingMole.SDK {
     /**
-     * Handler for the Team Service API
+     * Handler for the Teams API. These actions require client login first.
      */
-    class TeamService {
+    class TeamController {
         private oClient;
         /**
-         * Constructs new team service handler.
+         * Constructs new Teams API handler.
          * @param oClient - Client to use for the service.
          */
         constructor(oClient: JSClient);
@@ -140,7 +144,28 @@ declare module MeetingMole.SDK {
     }
 }
 
-declare module MeetingMole.Constants {
+declare module MeetingMole.SDK {
+    /**
+     * Handler for the Widgets API. These actions do not require client login.
+     */
+    class WidgetController {
+        private oClient;
+        /**
+         * Constructs new Widgets API handler.
+         * @param oClient - Client to use for the service.
+         */
+        constructor(oClient: JSClient);
+        /**
+         * Inits a capture widget.
+         * @param oParams - Capture widget initialization parameters.
+         */
+        Capture(oParams: Models.ICaptureWidgetParameters): void;
+        private captureWidgetSubmit(sEmail, oParams, onSuccess, onFailure);
+        private validateEmail(sEmail);
+    }
+}
+
+declare module MeetingMole.SDK.Constants {
     /**
      * API Base URL
      */
@@ -155,24 +180,72 @@ declare module MeetingMole.Constants {
         Logout: string;
     };
     /**
-     * Team API action URLs
+     * Teams API action URLs
      */
-    var TeamAPIURLs: {
+    var TeamsAPIURLs: {
         GetAll: string;
     };
+    /**
+     * Widget API action URLs
+     */
+    var WidgetsAPIURLs: {
+        CaptureSubmit: string;
+    };
+    /**
+     * Unified error codes across the sdk.
+     * System errors range: 0-99.
+     * Widget errors range: 100-199.
+     *
+     */
+    enum ErrorCodes {
+        /**
+         * Unknown error.
+         */
+        UnknownError = 0,
+        /**
+         * Http protocol error or server exception.
+         */
+        HttpError = 1,
+        /**
+         * The request succeeded, but the server returned an empty response.
+         */
+        EmptyResponse = 2,
+        /**
+         * A logical error occurred on the server, which prevented the action from being executed.
+         */
+        ServerRejected = 3,
+        WidgetError_EmailAddressInvalid = 100,
+    }
 }
 
-declare module MeetingMole.Models {
+declare module MeetingMole.SDK.Models {
     /**
-     * API Error
+     * API Error object.
      */
     interface IErrorModel {
+        /**
+         * Http Error code if any.
+         */
         HttpErrorCode: number;
+        /**
+         * Short error message. Error messages are always in English, unless triggered by the local browser without server interaction.
+         */
         Error: string;
+        /**
+         * Error details, if any.
+         */
         ErrorDetails: string;
+        /**
+         * Client library error code.
+         */
+        ClientErrorCode: Constants.ErrorCodes;
+        /**
+         * Client library error constant.
+         */
+        ClientErrorConstant: string;
     }
     /**
-     * About / ping result model
+     * About / ping result model.
      */
     interface IAboutModel {
         /**
@@ -193,7 +266,7 @@ declare module MeetingMole.Models {
         ServerTime: Date;
     }
     /**
-     * Version info
+     * Version info.
      */
     interface IVersionInfo {
         /**
@@ -214,16 +287,78 @@ declare module MeetingMole.Models {
         CoreVersion: string;
     }
     /**
-     * Authentication (verification) package
+     * Authentication (verification) package. To resume an interrupted API session without username/password login, all of these parameters must be passed.
      */
     interface IAuthenticationModel {
+        /**
+         * User login, username or email address.
+         */
         Username: string;
+        /**
+         * Current API access token.
+         */
         AccessToken: string;
+        /**
+         * Current client secret. Client secret is defined by you and is used to encrypt the tokens so that they cannot be manipulated on the server.
+         * It can also be considered to be a "local session token".
+         */
         ClientSecret: string;
     }
     /**
      * MeetingMole Team
      */
     interface ITeam {
+        /**
+         * ID of the team.
+         */
+        ID: number;
+        /**
+         * Name of the team.
+         */
+        TeamName: string;
+    }
+    /**
+     * Capture widget initialization parameters.
+     */
+    interface ICaptureWidgetParameters {
+        /**
+         * Optional. ID of the email field to wire the widget to. If not defined, you must supply the email via other means (as in OnSubmit event).
+         */
+        EmailFieldID?: string;
+        /**
+         * Mandatory. ID of the button to wire the widget to.
+         */
+        ButtonID: string;
+        /**
+         * Mandatory. ID of the team the widget belongs to.
+         */
+        TeamID: number;
+        /**
+         * Mandatory. ID of the widget definition on the server.
+         */
+        WidgetID: string;
+        /**
+         * Mandatory. API Key to use for authentication and origin validation.
+         */
+        API_KEY: string;
+        /**
+         * Optional. Triggers just before the request is sent to the server.
+         * If no email field is specified, must return the email address to add to the campaign. Otherwise should return null.
+         */
+        OnSubmit?: () => string;
+        /**
+         * Optional. Triggers if an error occurs.
+         * @param {IErrorModel} oError - Error object.
+         */
+        OnError?: (oError: IErrorModel) => void;
+        /**
+         * Optional. Triggers upon success.
+         */
+        OnSuccess?: () => void;
+        /**
+         * Optional. Triggers upon completion (whether error or success, triggered last)
+         * @param {boolean} bSuccess - True if the request was successful.
+         */
+        OnComplete?: (bSuccess: boolean) => void;
     }
 }
