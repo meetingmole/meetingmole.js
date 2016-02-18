@@ -57,8 +57,11 @@ oClient.Login("test@test.test", "test", ()=>{
 + MeetingMole API JavaScript Client Reference: [http://meetingmole.com](http://meetingmole.com)
 
 ###Change log:
-####1.0.2 - in development
+####1.0.x - in development
 + Initial functional public release.
+
+####1.0.0-1.0.2
++ Test packaging and framework releases. Partially or completely NON-FUNCTIONAL.
 
 ___
 
